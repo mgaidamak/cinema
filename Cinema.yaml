@@ -31,6 +31,37 @@ paths:
       responses:
         200:
           description: Cinema has been created
+  /cinema/:
+    get:
+      tags:
+      - cinema
+      - admin
+      summary: Get all cinemas
+      description: Get all cinemas
+      operationId: getCinemas
+      parameters:
+      - name: sort
+        in: query
+        description: Fields to sort
+        required: false
+        schema:
+          type: array
+          items:
+            format: string
+      - name: page
+        in: query
+        description: Offset-based strategy pagination
+        schema:
+          $ref: '#/components/schemas/Page'
+      responses:
+        200:
+          description: cinemas found
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cinema'
   /cinema/{id}:
     get:
       tags:
@@ -146,5 +177,14 @@ components:
           type: integer
           format: int64
         price:
+          type: integer
+          format: int64
+    Page:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        limit:
           type: integer
           format: int64

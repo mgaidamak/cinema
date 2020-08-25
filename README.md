@@ -182,3 +182,4 @@ TODO
 
 1. Русскоязычное руководство по OpenAPI 3.0 https://starkovden.github.io/openapi-tutorial-overview.html
 2. Официальное руководство http://spec.openapis.org/oas/v3.0.3
+3. https://jsonapi.org/
