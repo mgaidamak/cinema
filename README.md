@@ -104,7 +104,7 @@ docker-контейнер).
 2. HallID (REFERENCES Hall)
 3. X (Номер ряда)
 4. Y (Номер места)
-5. PricePlan (Номер в тарифной сетке)
+5. Sector (Номер в тарифной сетке)
 
 Параметры тарифа
 1. ID (autoincrement)
@@ -114,7 +114,7 @@ docker-контейнер).
 Цены это сочетание цены и номера в тарифной сетке:
 1. ID (autoincrement)
 2. TariffID (REFERENCES Tariff)
-3. Plan (Номер в тарифной сетке)
+3. Sector (Номер в тарифной сетке)
 4. Price (Цена)
 
 #### 2. Сеансы (Session)
@@ -137,6 +137,7 @@ docker-контейнер).
 2. FilmID (REFERENCES Film)
 3. HallID
 4. Date (дата начала сеанса в нулевом часовом поясе)
+5. TariffID
 
 #### 3. Билеты (Ticket)
 
@@ -176,3 +177,8 @@ TODO
 ## Используемые технологии
 
 TODO
+
+## Список использованной литературы
+
+1. Русскоязычное руководство по OpenAPI 3.0 https://starkovden.github.io/openapi-tutorial-overview.html
+2. Официальное руководство http://spec.openapis.org/oas/v3.0.3
