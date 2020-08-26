@@ -1,25 +1,19 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
   title: Cinema API
-  description: "Cinema API for Administrator to
-  * create cinema
-  * create halls at cinema
-  * create tariff
-  * tariff plan id with prices to tariff
-  * describe seats at hall with tariff plan id"
+  description: Cinema API for Administrator
   version: 1.0.0
   contact:
     name: Mikhail Gaidamaka
     url: https://github.com/mgaidamak
     email: magnoly.nsk@gmail.com
 servers:
-  - url: 'https'
+  - url: 'http://localhost:8080'
 paths:
   /cinema:
     post:
       tags:
       - cinema
-      - admin
       summary: Create new cinema
       description: Create new cinema
       operationId: createCinema
@@ -35,7 +29,6 @@ paths:
     get:
       tags:
       - cinema
-      - admin
       summary: Get all cinemas
       description: Get all cinemas
       operationId: getCinemas
@@ -66,7 +59,6 @@ paths:
     get:
       tags:
       - cinema
-      - admin
       summary: Get cinema by ID
       description: Get cinema by ID
       operationId: getCinemaById
@@ -85,6 +77,25 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Cinema'
+        404:
+          description: Cinema not found
+    delete:
+      tags:
+        - cinema
+      summary: Delete cinema by ID
+      description: Delete cinema by ID
+      operationId: deleteCinemaById
+      parameters:
+        - name: id
+          in: path
+          description: ID of cinema
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        204:
+          description: Cinema deletion request is successful and no content is returned
         404:
           description: Cinema not found
 
