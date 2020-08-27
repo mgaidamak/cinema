@@ -25,6 +25,10 @@ paths:
       responses:
         200:
           description: Cinema has been created
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Cinema'
   /cinema/:
     get:
       tags:

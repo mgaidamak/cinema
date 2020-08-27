@@ -1,0 +1,11 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+rootProject.name = 'cinema'
+include ':hall'
+include ':session'
+include ':ticket'
+include ':public'
