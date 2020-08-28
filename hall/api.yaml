@@ -149,13 +149,13 @@ components:
           format: int64
         x:
           type: integer
-          format: int64
+          format: int32
         y:
           type: integer
-          format: int64
+          format: int32
         sector:
           type: integer
-          format: int64
+          format: int32
       required:
       - hall
       - x
@@ -188,12 +188,14 @@ components:
         tariff:
           type: integer
           format: int64
+        name:
+          type: string
         sector:
           type: integer
-          format: int64
+          format: int32
         price:
           type: integer
-          format: int64
+          format: int32
     Page:
       type: object
       properties:

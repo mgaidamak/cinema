@@ -24,19 +24,12 @@ allprojects {
         kotlinOptions.jvmTarget = "1.8"
     }
 
-    kotlin {
-        experimental {
-            coroutines "enable"
-        }
-    }
-
     repositories {
         jcenter()
     }
 
     dependencies {
         compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-        compile "io.ktor:ktor-server-netty:$ktor_version"
     }
 }
 
