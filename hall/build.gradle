@@ -2,5 +2,7 @@ description = 'Hall application'
 dependencies {
     compile "io.ktor:ktor-server-netty:$ktor_version"
     compile "io.ktor:ktor-gson:$ktor_version"
+    compile "org.postgresql:postgresql:$jdbc_version"
     testCompile "io.ktor:ktor-server-test-host:$ktor_version"
+    testCompile "org.testcontainers:postgresql:$testcontainers_version"
 }

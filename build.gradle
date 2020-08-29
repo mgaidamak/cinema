@@ -4,6 +4,8 @@ version '0.0.1'
 buildscript {
     ext.kotlin_version = '1.4.0'
     ext.ktor_version = '1.4.0'
+    ext.jdbc_version = '42.2.16'
+    ext.testcontainers_version = '1.15.0-rc1'
     repositories {
         mavenCentral()
     }

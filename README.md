@@ -107,11 +107,12 @@ TODO
 * Язык программирования Kotlin 1.4;
 * JDK 8;
 * Легковесный фреймворк Ktor 1.4.0 для построения асинхронных серверных приложений;
-* PostgreSQL (v. todo), как основная база хранения данных;
+* PostgreSQL 12, как основная база хранения данных;
 * IntelliJ IDEA, как основная среда разработки;
 * OpenAPI 3.0.0, как формат описания API для последующей генерации 
 каркаса приложения сервера или клиента;
-* Actions на GitHub для CI.
+* Actions на GitHub для CI;
+* Testcontainers для запуска БД в тестах.
 
 ## Список использованной 'литературы'
 
@@ -125,3 +126,5 @@ https://jsonapi.org/
 https://ktor.io/
 * Официальные примеры приложений на Ktor
 https://github.com/ktorio/ktor-samples
+* https://www.testcontainers.org/
+* https://postgrespro.ru/docs/postgresql/12
