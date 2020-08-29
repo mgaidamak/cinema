@@ -1,7 +1,7 @@
 package org.mgaidamak
 
 data class Cinema(
-    val id: Long,
+    val id: Long = 0,
     val name: String,
     val city: String,
     val address: String,

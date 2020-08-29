@@ -3,6 +3,7 @@ package org.mgaidamak.repo
 import org.mgaidamak.Cinema
 import org.mgaidamak.Page
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.streams.toList
 
 /**
  * Not thread-safe repository for Hall application.
@@ -20,8 +21,9 @@ class FileHallRepo: IHallRepo {
 
     override fun getCinemas(page: Page, sort: List<String>): Collection<Cinema> {
         // TODO sorting
-        // TODO pagination
-        return map.values
+        return map.values.stream()
+            .skip(page.offset)
+            .limit(page.limit).toList()
     }
 
     override fun getCinemaById(id: Long): Cinema? {
@@ -30,5 +32,13 @@ class FileHallRepo: IHallRepo {
 
     override fun deleteCinemaById(id: Long): Cinema? {
         return map.remove(id)
+    }
+
+    override fun clear() {
+        map.clear()
+    }
+
+    override fun total(): Int {
+        return map.size
     }
 }
