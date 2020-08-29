@@ -4,10 +4,13 @@ import org.mgaidamak.Cinema
 import org.mgaidamak.Page
 import java.util.concurrent.atomic.AtomicLong
 
+/**
+ * Not thread-safe repository for Hall application.
+ */
 class FileHallRepo: IHallRepo {
 
-    private val next = AtomicLong()
-    private val map = HashMap<Long, Cinema>()
+    val next = AtomicLong()
+    val map = HashMap<Long, Cinema>()
 
     override fun createCinema(cinema: Cinema): Cinema {
         val newOne = cinema.copy(id = next.incrementAndGet())

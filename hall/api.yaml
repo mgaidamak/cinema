@@ -52,7 +52,7 @@ paths:
           $ref: '#/components/schemas/Page'
       responses:
         200:
-          description: cinemas found
+          description: List of cinema
           content:
             'application/json':
               schema:
@@ -76,11 +76,13 @@ paths:
           format: int64
       responses:
         200:
-          description: Cinema found
+          description: Cinema associated with ID
           content:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Cinema'
+        400:
+          description: Invalid id (not Long)
         404:
           description: Cinema not found
     delete:
@@ -98,8 +100,16 @@ paths:
             type: integer
             format: int64
       responses:
-        204:
-          description: Cinema deletion request is successful and no content is returned
+        200:
+          description: Previous cinema associated with ID
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cinema'
+        400:
+          description: Invalid id (not Long)
         404:
           description: Cinema not found
 

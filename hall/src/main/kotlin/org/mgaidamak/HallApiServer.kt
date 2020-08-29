@@ -20,8 +20,6 @@ class HallApiServer(val repo: IHallRepo) {
         get("/cinema/") {
             val page = Page(0, 10)
             val sort = listOf("id")
-            // val found = repo.getCinemas(page, sort)
-            // call.respond(found)
             repo.getCinemas(page, sort).also { call.respond(it) }
         }
 
