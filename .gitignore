@@ -29,3 +29,5 @@ hs_err_pid*
 build/
 out/
 .gradle/
+# Don't ignore. Used at GitHub
+!gradle-wrapper.jar
