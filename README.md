@@ -199,3 +199,5 @@ http://spec.openapis.org/oas/v3.0.0
 https://jsonapi.org/
 * Официальное руководство по Ktor
 https://ktor.io/
+* Официальные примеры приложений на Ktor
+https://github.com/ktorio/ktor-samples

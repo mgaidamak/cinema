@@ -9,20 +9,29 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import org.mgaidamak.repo.FileHallRepo
+import org.mgaidamak.repo.IHallRepo
 
 fun main(args: Array<String>) {
     embeddedServer(Netty, 8080) {
-        install(ContentNegotiation) {
-            gson {
-            }
-        }
-        routing {
-            get("/") {
-                call.respondText("My Hall App", ContentType.Text.Html)
-            }
-            HallApiServer(FileHallRepo()).apply {
-                registerCinema()
-            }
-        }
+        hall()
     }.start(wait = true)
+}
+
+fun Application.hall() {
+    hallWithDependencies(FileHallRepo())
+}
+
+fun Application.hallWithDependencies(repo: IHallRepo) {
+    install(ContentNegotiation) {
+        gson {
+        }
+    }
+    routing {
+        get("/") {
+            call.respondText("My Hall App", ContentType.Text.Html)
+        }
+        HallApiServer(repo).apply {
+            registerCinema()
+        }
+    }
 }

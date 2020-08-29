@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicLong
 
 class FileHallRepo: IHallRepo {
 
-    private val next = AtomicLong(0)
+    private val next = AtomicLong()
     private val map = HashMap<Long, Cinema>()
 
     override fun createCinema(cinema: Cinema): Cinema {
