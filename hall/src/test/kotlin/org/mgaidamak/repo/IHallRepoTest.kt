@@ -85,4 +85,4 @@ abstract class IHallRepoTest(private val repo: IHallRepo) {
 }
 
 class FileHallRepoTest: IHallRepoTest(FileHallRepo())
-class DbHallRepoTest: IHallRepoTest(DbHallRepo())
+// TODO class DbHallRepoTest: IHallRepoTest(DbHallRepo())
