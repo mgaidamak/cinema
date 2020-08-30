@@ -32,8 +32,10 @@ docker-контейнер).
 4. Описываем API по стандарту OpenAPI 3.0.0
 5. Часть исходников можно сгенерировать в IntelliJ IDEA ktor плагином, но что-то это делать не хочется.
 6. Написать тесты для RESTful API
-7. Написать тесты для репозитория
+7. Написать тесты для репозитория на Testcontainers
 8. Запуск тестов на Github
+9. Запуск Docker compose
+10. Может быть, разобраться с логами?
 
 ### Пользовательские сценарии
 
@@ -100,6 +102,12 @@ docker-контейнер).
 
 ## Запуск
 
+```
+./gradlew build
+docker build -t cinema-hall hall/
+docker run -m512M --cpus 1 -it -p 8081:8081 --rm cinema-hall
+```
+
 ### Создание схемы в базе данных
 
 ```
@@ -131,7 +139,8 @@ sudo -u postgres psql -d hall -a -f hall/src/main/resources/schema.sql
 * OpenAPI 3.0.0, как формат описания API для последующей генерации 
 каркаса приложения сервера или клиента;
 * Actions на GitHub для CI;
-* Testcontainers для запуска БД в тестах.
+* Testcontainers для запуска БД в тестах;
+* Docker 19.03.12.
 
 ## Список использованной 'литературы'
 
