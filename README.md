@@ -103,10 +103,14 @@ docker-контейнер).
 ## Запуск
 
 ```
-./gradlew build
+./gradlew shadowJar
 docker build -t cinema-hall hall/
-docker run -m512M --cpus 1 -it -p 8081:8081 --rm cinema-hall
+docker-compose up
 ```
+
+После запуска, API доступны на портах:
+* 8081 - hall
+* 15432 - postgresql
 
 ### Создание схемы в базе данных
 
@@ -115,7 +119,7 @@ sudo -u postgres psql
 postgres=# create database hall;
 postgres=# create database session;
 postgres=# create database ticket;
-postgres=# create user cinema with encrypted password 'cinemapass';
+postgres=# CREATE USER cinema WITH ENCRYPTED PASSWORD 'cinemapass';
 postgres=# grant all privileges on database hall to cinema;
 postgres=# grant all privileges on database session to cinema;
 postgres=# grant all privileges on database ticket to cinema;
@@ -146,15 +150,12 @@ sudo -u postgres psql -d hall -a -f hall/src/main/resources/schema.sql
 
 * Русскоязычное руководство по OpenAPI 3.0
 https://starkovden.github.io/openapi-tutorial-overview.html
-* Официальное руководство
-http://spec.openapis.org/oas/v3.0.0
-* Рекомендации по проектированию JSON API
-https://jsonapi.org/
-* Официальное руководство по Ktor
-https://ktor.io/
-* Официальные примеры приложений на Ktor
-https://github.com/ktorio/ktor-samples
-* https://www.testcontainers.org/
-* https://postgrespro.ru/docs/postgresql/12
-* Про хвостовую рекурсию в Kotlin
-https://kotlinlang.ru/docs/reference/functions.html
+* Официальное руководство http://spec.openapis.org/oas/v3.0.0
+* Рекомендации по проектированию JSON API https://jsonapi.org/
+* Официальное руководство по Ktor https://ktor.io/
+* Официальные примеры приложений на Ktor https://github.com/ktorio/ktor-samples
+* Официальное руководство по Testcontainers https://www.testcontainers.org/
+* Русскоязычная документация PostgresSQL https://postgrespro.ru/docs/postgresql/12
+* Про хвостовую рекурсию в Kotlin https://kotlinlang.ru/docs/reference/functions.html
+* Про Docker compose https://docs.docker.com/compose/
+* Про запуск PostgeSQL в Docker https://hub.docker.com/_/postgres

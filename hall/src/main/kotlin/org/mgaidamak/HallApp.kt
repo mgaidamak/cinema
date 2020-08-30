@@ -11,24 +11,28 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.util.KtorExperimentalAPI
+import org.mgaidamak.repo.DbHallRepo
 import org.mgaidamak.repo.FileHallRepo
 import org.mgaidamak.repo.IHallRepo
+import java.util.Properties
 
 @KtorExperimentalAPI
 fun main(args: Array<String>) {
     val env = applicationEngineEnvironment {
-        module { hall() }
         config = HoconApplicationConfig(ConfigFactory.load())
         connector {
             host = config.property("ktor.deployment.host").getString()
             port = config.property("ktor.deployment.port").getString().toInt()
         }
+
+        val url = config.property("postgres.hall.url").getString()
+        val props = Properties().apply {
+            setProperty("user", config.property("postgres.auth.user").getString())
+            setProperty("password", config.property("postgres.auth.password").getString())
+        }
+        module { hallWithDependencies(DbHallRepo(url, props)) }
     }
     embeddedServer(Netty, env).start(true)
-}
-
-fun Application.hall() {
-    hallWithDependencies(FileHallRepo())
 }
 
 fun Application.hallWithDependencies(repo: IHallRepo) {
