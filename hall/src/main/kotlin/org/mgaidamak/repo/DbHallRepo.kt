@@ -10,7 +10,8 @@ import java.util.Properties
 /**
  * Production ready repository on PostgreSQL
  */
-class DbHallRepo(private val url: String, private val props: Properties): IHallRepo {
+class DbHallRepo(private val url: String,
+                 private val props: Properties = Properties()): IHallRepo {
 
     override fun createCinema(cinema: Cinema): Cinema {
         val sql = "INSERT INTO cinema (name, city, address, timezone) VALUES (?, ?, ?, ?) RETURNING id"

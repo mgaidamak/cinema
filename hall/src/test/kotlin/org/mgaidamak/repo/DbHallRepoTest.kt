@@ -1,32 +1,10 @@
 package org.mgaidamak.repo
 
-import org.junit.Test
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.utility.DockerImageName
-import java.util.Properties
+// TC_DAEMON - start container and keep it running till you stop it explicitly or JVM is shutdown
+const val url = "jdbc:tc:postgresql:12://127.0.0.1:5432/hall?TC_INITSCRIPT=schema.sql?TC_DAEMON=true"
 
 /**
  * Test PostgreSQL implementation of repo
+ * It uses url-based testcontainer management
  */
-class DbHallRepoTest: IHallRepoTest(DbHallRepo(url, props)) {
-    companion object {
-        val image = DockerImageName.parse("postgres:12")
-        val url = "jdbc:tc:postgresql:12://127.0.0.1:5432/hall"
-        val props = Properties().apply {
-            put("user", "cinema")
-            put("password", "cinemapass")
-        }
-    }
-
-    @Test
-    override fun `create cinema`() {
-        PostgreSQLContainer<Nothing>(image).apply {
-            withInitScript("schema.sql")
-            withUsername("cinema")
-            withPassword("cinemapass")
-        }.use { postgres ->
-            postgres.start()
-            super.`create cinema`()
-        }
-    }
-}
+class DbHallRepoTest: IHallRepoTest(DbHallRepo(url))
