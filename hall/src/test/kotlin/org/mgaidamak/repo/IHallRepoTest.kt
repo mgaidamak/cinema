@@ -83,6 +83,3 @@ abstract class IHallRepoTest(private val repo: IHallRepo) {
         assertNull(repo.deleteCinemaById(newOne.id + 1))
     }
 }
-
-class FileHallRepoTest: IHallRepoTest(FileHallRepo())
-// TODO class DbHallRepoTest: IHallRepoTest(DbHallRepo())

@@ -147,3 +147,5 @@ https://ktor.io/
 https://github.com/ktorio/ktor-samples
 * https://www.testcontainers.org/
 * https://postgrespro.ru/docs/postgresql/12
+* Про хвостовую рекурсию в Kotlin
+https://kotlinlang.ru/docs/reference/functions.html

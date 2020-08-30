@@ -1,4 +1,6 @@
 package org.mgaidamak.repo
 
-class DbHallRepoTest: IHallRepoTest(DbHallRepo()) {
-}
+/**
+ * Test PostgreSQL implementation of repo
+ */
+class DbHallRepoTest: IHallRepoTest(DbHallRepo())
