@@ -11,9 +11,8 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.util.KtorExperimentalAPI
-import org.mgaidamak.repo.DbHallRepo
-import org.mgaidamak.repo.FileHallRepo
-import org.mgaidamak.repo.IHallRepo
+import org.mgaidamak.dao.cinema.DbCinemaRepo
+import org.mgaidamak.dao.cinema.ICinemaRepo
 import java.util.Properties
 
 @KtorExperimentalAPI
@@ -30,12 +29,12 @@ fun main(args: Array<String>) {
             setProperty("user", config.property("postgres.auth.user").getString())
             setProperty("password", config.property("postgres.auth.password").getString())
         }
-        module { hallWithDependencies(DbHallRepo(url, props)) }
+        module { cinema(DbCinemaRepo(url, props)) }
     }
     embeddedServer(Netty, env).start(true)
 }
 
-fun Application.hallWithDependencies(repo: IHallRepo) {
+fun Application.cinema(repo: ICinemaRepo) {
     install(ContentNegotiation) {
         gson {
         }

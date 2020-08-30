@@ -8,8 +8,8 @@ import io.ktor.server.testing.withTestApplication
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import org.mgaidamak.repo.FileHallRepo
-import kotlin.test.AfterTest
+import org.mgaidamak.dao.Cinema
+import org.mgaidamak.dao.cinema.FileCinemaRepo
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -151,11 +151,11 @@ class HallAppTest {
 
     private fun testApp(callback: TestApplicationEngine.() -> Unit) {
         withTestApplication({
-            hallWithDependencies(repo)
+            cinema(repo)
         }, callback)
     }
 
     companion object {
-        val repo = FileHallRepo()
+        val repo = FileCinemaRepo()
     }
 }

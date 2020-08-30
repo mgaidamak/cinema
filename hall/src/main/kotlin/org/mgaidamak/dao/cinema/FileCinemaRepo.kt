@@ -1,19 +1,19 @@
-package org.mgaidamak.repo
+package org.mgaidamak.dao.cinema
 
-import org.mgaidamak.Cinema
-import org.mgaidamak.Page
-import java.util.concurrent.atomic.AtomicLong
+import org.mgaidamak.dao.Cinema
+import org.mgaidamak.dao.Page
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.streams.toList
 
 /**
  * Not thread-safe repository for Hall application.
  */
-class FileHallRepo: IHallRepo {
+class FileCinemaRepo: ICinemaRepo {
 
-    val next = AtomicLong()
-    val map = HashMap<Long, Cinema>()
+    val next = AtomicInteger()
+    val map = HashMap<Int, Cinema>()
 
-    override fun createCinema(cinema: Cinema): Cinema {
+    override fun createCinema(cinema: Cinema): Cinema? {
         val newOne = cinema.copy(id = next.incrementAndGet())
         map[newOne.id] = newOne
         return newOne
@@ -22,15 +22,15 @@ class FileHallRepo: IHallRepo {
     override fun getCinemas(page: Page, sort: List<String>): Collection<Cinema> {
         // TODO sorting
         return map.values.stream()
-            .skip(page.offset)
-            .limit(page.limit).toList()
+            .skip(page.offset.toLong())
+            .limit(page.limit.toLong()).toList()
     }
 
-    override fun getCinemaById(id: Long): Cinema? {
+    override fun getCinemaById(id: Int): Cinema? {
         return map[id]
     }
 
-    override fun deleteCinemaById(id: Long): Cinema? {
+    override fun deleteCinemaById(id: Int): Cinema? {
         return map.remove(id)
     }
 
