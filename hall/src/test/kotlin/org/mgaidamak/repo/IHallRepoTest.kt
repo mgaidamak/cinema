@@ -11,14 +11,9 @@ import kotlin.test.assertTrue
 /**
  * In this class we test, that all methods of repo work in concert
  */
-abstract class IHallRepoTest(private val repo: IHallRepo) {
-    @BeforeTest
-    fun `clean up`() {
-        repo.clear()
-    }
-
+abstract class IHallRepoTest(protected val repo: IHallRepo) {
     @Test
-    fun `create cinema`() {
+    open fun `create cinema`() {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
         val newOne = repo.createCinema(cinema)

@@ -10,7 +10,8 @@ import java.util.Properties
 /**
  * Production ready repository on PostgreSQL
  */
-class DbHallRepo: IHallRepo {
+class DbHallRepo(private val url: String, private val props: Properties): IHallRepo {
+
     override fun createCinema(cinema: Cinema): Cinema {
         val sql = "INSERT INTO cinema (name, city, address, timezone) VALUES (?, ?, ?, ?) RETURNING id"
         return DriverManager.getConnection(url, props).use { connection ->
@@ -75,15 +76,6 @@ class DbHallRepo: IHallRepo {
             connection.createStatement().executeQuery(sql).let { rs ->
                 if (rs.next()) rs.getInt(1) else 0
             }
-        }
-    }
-
-    companion object {
-        // TODO use application.conf
-        val url = "jdbc:postgresql://127.0.0.1:5432/hall"
-        val props = Properties().apply {
-            put("user", "cinema")
-            put("password", "cinemapass")
         }
     }
 }
