@@ -11,13 +11,13 @@ import java.util.Properties
  */
 class DbHallRepo: IHallRepo {
     override fun createCinema(cinema: Cinema): Cinema {
-        val sql = "INSERT INTO hall (name, city, address, timezone) VALUES (?, ?, ?, ?)"
+        val sql = "INSERT INTO cinema (name, city, address, timezone) VALUES (?, ?, ?, ?)"
         return DriverManager.getConnection(url, props).use { it ->
             it.prepareStatement(sql).apply {
-                setString(0, cinema.name)
-                setString(1, cinema.city)
-                setString(2, cinema.address)
-                setString(3, cinema.timezone)
+                setString(1, cinema.name)
+                setString(2, cinema.city)
+                setString(3, cinema.address)
+                setString(4, cinema.timezone)
             }.apply {
                 execute()
             }.generatedKeys.let {
@@ -52,10 +52,11 @@ class DbHallRepo: IHallRepo {
     }
 
     companion object {
+        // TODO use application.conf
         val url = "jdbc:postgresql://127.0.0.1:5432/hall"
         val props = Properties().apply {
-            put("user", "user")
-            put("password", "password")
+            put("user", "cinema")
+            put("password", "cinemapass")
         }
     }
 }

@@ -1,4 +1,4 @@
-CREATE TABLE cinema (
+CREATE TABLE IF NOT EXISTS cinema (
     id SERIAL,
     name text,
     city text,

@@ -100,7 +100,26 @@ docker-контейнер).
 
 ## Запуск
 
-TODO
+### Создание схемы в базе данных
+
+```
+sudo -u postgres psql
+postgres=# create database hall;
+postgres=# create database session;
+postgres=# create database ticket;
+postgres=# create user cinema with encrypted password 'cinemapass';
+postgres=# grant all privileges on database hall to cinema;
+postgres=# grant all privileges on database session to cinema;
+postgres=# grant all privileges on database ticket to cinema;
+postgres=# \connect hall
+postgres=# grant all privileges on all tables in schema public to cinema;
+postgres=# GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO cinema;
+postgres=# \connect session
+postgres=# grant all privileges on all tables in schema public to cinema;
+postgres=# \connect ticket
+postgres=# grant all privileges on all tables in schema public to cinema;
+sudo -u postgres psql -d hall -a -f hall/src/main/resources/schema.sql
+```
 
 ## Используемые технологии
 
