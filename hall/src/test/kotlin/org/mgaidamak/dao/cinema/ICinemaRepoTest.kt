@@ -30,13 +30,13 @@ abstract class ICinemaRepoTest(private val repo: ICinemaRepo) {
     fun `list cinemas`() {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        val newOne = repo.createCinema(cinema)
-        println(newOne)
-        val newTwo = repo.createCinema(cinema)
-        println(newTwo)
-        val expected = listOf(newOne, newTwo)
+        val first = repo.createCinema(cinema)
+        println("Created first $first")
+        val second = repo.createCinema(cinema)
+        println("Created second $second")
+        val expected = listOf(first, second)
         val found = repo.getCinemas()
-        println(found)
+        println("Found list $found")
         assertTrue { found.containsAll(expected) }
         assertEquals(expected.size, found.size)
     }
@@ -45,10 +45,11 @@ abstract class ICinemaRepoTest(private val repo: ICinemaRepo) {
     fun `list cinemas page`() {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        repo.createCinema(cinema)
-        val newTwo = repo.createCinema(cinema)
-        println(newTwo)
-        val expected = listOf(newTwo)
+        val first = repo.createCinema(cinema)
+        println("Created first $first")
+        val second = repo.createCinema(cinema)
+        println("Created first $second")
+        val expected = listOf(second)
         val found = repo.getCinemas(page = Page(1, 2))
         assertTrue { found.containsAll(expected) }
         assertEquals(expected.size, found.size)

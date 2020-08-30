@@ -29,8 +29,8 @@ class DbCinemaRepo(private val url: String,
                 }
             }
         } catch (e: Exception) {
-            println(e)
-            null
+            e.printStackTrace()
+            return null
         }
     }
 

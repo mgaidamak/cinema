@@ -1,19 +1,19 @@
-CREATE TABLE cinema (
-    id SERIAL,
+CREATE TABLE IF NOT EXISTS cinema (
+    id SERIAL PRIMARY KEY,
     name text,
     city text,
     address text,
     timezone text
 );
 
-CREATE TABLE hall (
-    id SERIAL,
-    cinema integer,
+CREATE TABLE IF NOT EXISTS hall (
+    id SERIAL PRIMARY KEY,
+    cinema integer REFERENCES cinema (id) ON DELETE CASCADE,
     name text
 );
 
-CREATE TABLE seat (
-    id SERIAL,
-    hall integer,
+CREATE TABLE IF NOT EXISTS seat (
+    id SERIAL PRIMARY KEY,
+    hall integer REFERENCES hall (id) ON DELETE CASCADE,
     name text
 );
