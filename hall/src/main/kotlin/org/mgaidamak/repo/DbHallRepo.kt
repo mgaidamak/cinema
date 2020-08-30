@@ -11,7 +11,7 @@ import java.util.Properties
  */
 class DbHallRepo: IHallRepo {
     override fun createCinema(cinema: Cinema): Cinema {
-        val sql = "INSERT INTO cinema (name, city, address, timezone) VALUES (?, ?, ?, ?)"
+        val sql = "INSERT INTO cinema (name, city, address, timezone) VALUES (?, ?, ?, ?) RETURNING id"
         return DriverManager.getConnection(url, props).use { it ->
             it.prepareStatement(sql).apply {
                 setString(1, cinema.name)
@@ -19,8 +19,8 @@ class DbHallRepo: IHallRepo {
                 setString(3, cinema.address)
                 setString(4, cinema.timezone)
             }.apply {
-                execute()
-            }.generatedKeys.let {
+                executeQuery()
+            }.resultSet.let {
                 if (it.next()) {
                     it.getLong(1)
                 } else {
@@ -45,10 +45,23 @@ class DbHallRepo: IHallRepo {
     }
 
     override fun clear() {
+        val sql = "DELETE FROM cinema"
+        DriverManager.getConnection(url, props).use {
+            it.createStatement().executeUpdate(sql)
+        }
     }
 
     override fun total(): Int {
-        TODO("Not yet implemented")
+        val sql = "SELECT COUNT(*) FROM cinema"
+        return DriverManager.getConnection(url, props).use {
+            it.createStatement().executeQuery(sql).let {
+                if (it.next()) {
+                    it.getInt(1)
+                } else {
+                    0
+                }
+            }
+        }
     }
 
     companion object {
