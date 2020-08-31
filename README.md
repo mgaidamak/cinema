@@ -1,5 +1,7 @@
 # cinema
 
+[![CI tests](https://github.com/mgaidamak/cinema/workflows/Gradle/badge.svg)](https://github.com/mgaidamak/cinema/actions)
+
 ## Исходная задача
 
 Необходимо написать REST сервис для бронирования мест в кинотеатрах.

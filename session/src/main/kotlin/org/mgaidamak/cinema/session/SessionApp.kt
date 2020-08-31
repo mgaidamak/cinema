@@ -3,7 +3,6 @@ package org.mgaidamak.cinema.session
 import com.typesafe.config.ConfigFactory
 import io.ktor.application.*
 import io.ktor.config.HoconApplicationConfig
-import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
 import io.ktor.http.*
@@ -13,9 +12,8 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.util.KtorExperimentalAPI
+import org.mgaidamak.cinema.session.dao.film.DbFilmRepo
 import org.mgaidamak.cinema.session.dao.film.IFilmRepo
-import org.mgaidamak.dao.cinema.DbCinemaRepo
-import org.mgaidamak.dao.cinema.ICinemaRepo
 import java.util.Properties
 
 @KtorExperimentalAPI

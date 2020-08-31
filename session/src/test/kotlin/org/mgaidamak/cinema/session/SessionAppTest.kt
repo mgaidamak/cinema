@@ -4,6 +4,8 @@ import io.ktor.http.*
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
+import org.mgaidamak.cinema.session.dao.film.DbFilmRepo
+import org.mgaidamak.cinema.session.dao.film.DbFilmRepoTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -23,6 +25,6 @@ class SessionAppTest {
     }
 
     companion object {
-        val repo = DbFilmRepo()
+        val repo = DbFilmRepo(DbFilmRepoTest.url)
     }
 }
