@@ -1,5 +1,6 @@
 package org.mgaidamak.dao.seat
 
+import org.mgaidamak.dao.DbRepo
 import org.mgaidamak.dao.Seat
 import org.mgaidamak.dao.Page
 
@@ -10,21 +11,22 @@ import java.util.Properties
 /**
  * Production ready repository on PostgreSQL
  */
-class DbSeatRepo(private val url: String,
-                 private val props: Properties = Properties()): ISeatRepo {
+class DbSeatRepo(url: String,
+                 props: Properties = Properties()): DbRepo(url, props), ISeatRepo {
 
     override fun createSeat(seat: Seat): Seat? {
         val sql = "INSERT INTO seat (hall, x, y) VALUES (?, ?, ?) RETURNING id"
         return try {
             DriverManager.getConnection(url, props).use { connection ->
-                connection.prepareStatement(sql).apply {
-                    setInt(1, seat.hall)
-                    setInt(2, seat.x)
-                    setInt(3, seat.y)
-                }.executeQuery().let { rs ->
-                    if (rs.next()) rs.getInt(1) else 0
-                }.let {
-                    Seat(it, seat.hall, seat.x, seat.y)
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setInt(1, seat.hall)
+                    ps.setInt(2, seat.x)
+                    ps.setInt(3, seat.y)
+                    ps.executeQuery().use { rs ->
+                        if (rs.next()) rs.getInt(1) else null
+                    }?.let {
+                        Seat(it, seat.hall, seat.x, seat.y)
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -41,12 +43,13 @@ class DbSeatRepo(private val url: String,
                           page: Page): Collection<Seat> {
         val sql = "SELECT id, hall, x, y FROM seat WHERE hall=? LIMIT ? OFFSET ?"
         return try {
-            DriverManager.getConnection(url, props).use { it ->
-                it.prepareStatement(sql).apply {
-                    setInt(1, hall)
-                    setInt(2, page.limit)
-                    setInt(3, page.offset)
-                }.executeQuery().collect(emptyList())
+            DriverManager.getConnection(url, props).use { connection ->
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setInt(1, hall)
+                    ps.setInt(2, page.limit)
+                    ps.setInt(3, page.offset)
+                    ps.executeQuery().use { it.collect(emptyList()) }
+                }
             }
         } catch (e: Exception) {
             println(e)
@@ -56,12 +59,13 @@ class DbSeatRepo(private val url: String,
 
     private fun querySeat(id: Int, sql: String): Seat? {
         return try {
-            DriverManager.getConnection(url, props).use { it ->
-                it.prepareStatement(sql).apply {
-                    setInt(1, id)
-                }.executeQuery().let {
-                    if (it.next()) Seat(id, it.getInt(1),
-                        it.getInt(2), it.getInt(3)) else null
+            DriverManager.getConnection(url, props).use { connection ->
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setInt(1, id)
+                    ps.executeQuery().use { rs ->
+                        if (rs.next()) Seat(id, rs.getInt(1),
+                            rs.getInt(2), rs.getInt(3)) else null
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -75,28 +79,7 @@ class DbSeatRepo(private val url: String,
         return querySeat(id, sql)
     }
 
-    override fun clear() {
-        val sql = "DELETE FROM hall"
-        try {
-            DriverManager.getConnection(url, props).use {
-                it.createStatement().executeUpdate(sql)
-            }
-        } catch (e: Exception) {
-            println(e)
-        }
-    }
+    override fun clear() = clear("DELETE FROM seat")
 
-    override fun total(): Int {
-        val sql = "SELECT COUNT(*) FROM seat"
-        return try {
-            DriverManager.getConnection(url, props).use { connection ->
-                connection.createStatement().executeQuery(sql).let { rs ->
-                    if (rs.next()) rs.getInt(1) else 0
-                }
-            }
-        } catch (e: Exception) {
-            println(e)
-            0
-        }
-    }
+    override fun total() = total("SELECT COUNT(*) FROM seat")
 }

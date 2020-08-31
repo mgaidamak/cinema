@@ -1,6 +1,7 @@
 package org.mgaidamak.dao.cinema
 
 import org.mgaidamak.dao.Cinema
+import org.mgaidamak.dao.DbRepo
 import org.mgaidamak.dao.Page
 
 import java.sql.DriverManager
@@ -10,22 +11,23 @@ import java.util.Properties
 /**
  * Production ready repository on PostgreSQL
  */
-class DbCinemaRepo(private val url: String,
-                   private val props: Properties = Properties()): ICinemaRepo {
+class DbCinemaRepo(url: String,
+                   props: Properties = Properties()): DbRepo(url, props), ICinemaRepo {
 
     override fun createCinema(cinema: Cinema): Cinema? {
         val sql = "INSERT INTO cinema (name, city, address, timezone) VALUES (?, ?, ?, ?) RETURNING id"
         return try {
             DriverManager.getConnection(url, props).use { connection ->
-                connection.prepareStatement(sql).apply {
-                    setString(1, cinema.name)
-                    setString(2, cinema.city)
-                    setString(3, cinema.address)
-                    setString(4, cinema.timezone)
-                }.executeQuery().let { rs ->
-                    if (rs.next()) rs.getInt(1) else 0
-                }.let {
-                    Cinema(it, cinema.name, cinema.city, cinema.address, cinema.timezone)
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setString(1, cinema.name)
+                    ps.setString(2, cinema.city)
+                    ps.setString(3, cinema.address)
+                    ps.setString(4, cinema.timezone)
+                    ps.executeQuery().use { rs ->
+                        if (rs.next()) rs.getInt(1) else null
+                    }?.let {
+                        Cinema(it, cinema.name, cinema.city, cinema.address, cinema.timezone)
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -41,11 +43,12 @@ class DbCinemaRepo(private val url: String,
     override fun getCinemas(page: Page, sort: List<String>): Collection<Cinema> {
         val sql = "SELECT id, name, city, address, timezone FROM cinema LIMIT ? OFFSET ?"
         return try {
-            DriverManager.getConnection(url, props).use { it ->
-                it.prepareStatement(sql).apply {
-                    setInt(1, page.limit)
-                    setInt(2, page.offset)
-                }.executeQuery().collect(emptyList())
+            DriverManager.getConnection(url, props).use { connection ->
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setInt(1, page.limit)
+                    ps.setInt(2, page.offset)
+                    ps.executeQuery().use { it.collect(emptyList()) }
+                }
             }
         } catch (e: Exception) {
             println(e)
@@ -55,12 +58,13 @@ class DbCinemaRepo(private val url: String,
 
     private fun queryCinema(id: Int, sql: String): Cinema? {
         return try {
-            DriverManager.getConnection(url, props).use { it ->
-                it.prepareStatement(sql).apply {
-                    setInt(1, id)
-                }.executeQuery().let {
-                    if (it.next()) Cinema(id, it.getString(1), it.getString(2),
-                        it.getString(3), it.getString(4)) else null
+            DriverManager.getConnection(url, props).use { connection ->
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setInt(1, id)
+                    ps.executeQuery().use { rs ->
+                        if (rs.next()) Cinema(id, rs.getString(1), rs.getString(2),
+                            rs.getString(3), rs.getString(4)) else null
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -79,28 +83,7 @@ class DbCinemaRepo(private val url: String,
         return queryCinema(id, sql)
     }
 
-    override fun clear() {
-        val sql = "DELETE FROM cinema"
-        try {
-            DriverManager.getConnection(url, props).use {
-                it.createStatement().executeUpdate(sql)
-            }
-        } catch (e: Exception) {
-            println(e)
-        }
-    }
+    override fun clear() = clear("DELETE FROM cinema")
 
-    override fun total(): Int {
-        val sql = "SELECT COUNT(*) FROM cinema"
-        return try {
-            DriverManager.getConnection(url, props).use { connection ->
-                connection.createStatement().executeQuery(sql).let { rs ->
-                    if (rs.next()) rs.getInt(1) else 0
-                }
-            }
-        } catch (e: Exception) {
-            println(e)
-            0
-        }
-    }
+    override fun total() = total("SELECT COUNT(*) FROM cinema")
 }

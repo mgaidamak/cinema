@@ -27,12 +27,12 @@ abstract class ISeatRepoTest(private val repo: ISeatRepo,
     private fun createCinema(): Int {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        return crepo.createCinema(cinema)?.id ?: 0
+        return assertNotNull(crepo.createCinema(cinema)).id
     }
 
     private fun createHall(cinema: Int): Int {
         val hall = Hall(cinema = cinema, name = "Big")
-        return hrepo.createHall(hall)?.id ?: 0
+        return assertNotNull(hrepo.createHall(hall)).id
     }
 
     @Test

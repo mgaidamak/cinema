@@ -1,5 +1,6 @@
 package org.mgaidamak.cinema.session.dao.film
 
+import org.mgaidamak.cinema.session.dao.DbRepo
 import org.mgaidamak.cinema.session.dao.Film
 import org.mgaidamak.cinema.session.dao.Page
 
@@ -10,19 +11,20 @@ import java.util.Properties
 /**
  * Production ready repository on PostgreSQL
  */
-class DbFilmRepo(private val url: String,
-                 private val props: Properties = Properties()): IFilmRepo {
+class DbFilmRepo(url: String,
+                 props: Properties = Properties()): DbRepo(url, props), IFilmRepo {
 
     override fun createFilm(film: Film): Film? {
         val sql = "INSERT INTO film (name) VALUES (?) RETURNING id"
         return try {
             DriverManager.getConnection(url, props).use { connection ->
-                connection.prepareStatement(sql).apply {
-                    setString(1, film.name)
-                }.executeQuery().use { rs ->
-                    if (rs.next()) rs.getInt(1) else null
-                }?.let {
-                    Film(it, film.name)
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setString(1, film.name)
+                    ps.executeQuery().use { rs ->
+                        if (rs.next()) rs.getInt(1) else null
+                    }?.let {
+                        Film(it, film.name)
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -37,12 +39,13 @@ class DbFilmRepo(private val url: String,
     override fun getFilms(page: Page, sort: List<String>, filter: String?): Collection<Film> {
         val sql = "SELECT id, name FROM film WHERE name ILIKE '%' || ? || '%' LIMIT ? OFFSET ?"
         return try {
-            DriverManager.getConnection(url, props).use {
-                it.prepareStatement(sql).apply {
-                    setString(1, filter ?: "")
-                    setInt(2, page.limit)
-                    setInt(3, page.offset)
-                }.executeQuery().collect(emptyList())
+            DriverManager.getConnection(url, props).use { it ->
+                it.prepareStatement(sql).use { ps ->
+                    ps.setString(1, filter ?: "")
+                    ps.setInt(2, page.limit)
+                    ps.setInt(3, page.offset)
+                    ps.executeQuery().use { it.collect(emptyList()) }
+                }
             }
         } catch (e: Exception) {
             println(e)
@@ -52,11 +55,12 @@ class DbFilmRepo(private val url: String,
 
     private fun queryFilm(id: Int, sql: String): Film? {
         return try {
-            DriverManager.getConnection(url, props).use { it ->
-                it.prepareStatement(sql).apply {
-                    setInt(1, id)
-                }.executeQuery().let {
-                    if (it.next()) Film(id, it.getString(1)) else null
+            DriverManager.getConnection(url, props).use { connection ->
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setInt(1, id)
+                    ps.executeQuery().use { rs ->
+                        if (rs.next()) Film(id, rs.getString(1)) else null
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -75,28 +79,7 @@ class DbFilmRepo(private val url: String,
         return queryFilm(id, sql)
     }
 
-    override fun clear() {
-        val sql = "DELETE FROM film"
-        try {
-            DriverManager.getConnection(url, props).use {
-                it.createStatement().executeUpdate(sql)
-            }
-        } catch (e: Exception) {
-            println(e)
-        }
-    }
+    override fun clear() = clear("DELETE FROM film")
 
-    override fun total(): Int {
-        val sql = "SELECT COUNT(*) FROM film"
-        return try {
-            DriverManager.getConnection(url, props).use { connection ->
-                connection.createStatement().executeQuery(sql).let { rs ->
-                    if (rs.next()) rs.getInt(1) else 0
-                }
-            }
-        } catch (e: Exception) {
-            println(e)
-            0
-        }
-    }
+    override fun total() = total("SELECT COUNT(*) FROM film")
 }

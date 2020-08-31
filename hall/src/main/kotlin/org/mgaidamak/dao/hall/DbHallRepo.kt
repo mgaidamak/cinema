@@ -1,5 +1,6 @@
 package org.mgaidamak.dao.hall
 
+import org.mgaidamak.dao.DbRepo
 import org.mgaidamak.dao.Hall
 import org.mgaidamak.dao.Page
 
@@ -10,25 +11,26 @@ import java.util.Properties
 /**
  * Production ready repository on PostgreSQL
  */
-class DbHallRepo(private val url: String,
-                 private val props: Properties = Properties()): IHallRepo {
+class DbHallRepo(url: String,
+                 props: Properties = Properties()): DbRepo(url, props), IHallRepo {
 
     override fun createHall(hall: Hall): Hall? {
         val sql = "INSERT INTO hall (cinema, name) VALUES (?, ?) RETURNING id"
-        try {
-            return DriverManager.getConnection(url, props).use { connection ->
-                connection.prepareStatement(sql).apply {
-                    setInt(1, hall.cinema)
-                    setString(2, hall.name)
-                }.executeQuery().let { rs ->
-                    if (rs.next()) rs.getInt(1) else 0
-                }.let {
-                    Hall(it, hall.cinema, hall.name)
+        return try {
+            DriverManager.getConnection(url, props).use { connection ->
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setInt(1, hall.cinema)
+                    ps.setString(2, hall.name)
+                    ps.executeQuery().use { rs ->
+                        if (rs.next()) rs.getInt(1) else null
+                    }?.let {
+                        Hall(it, hall.cinema, hall.name)
+                    }
                 }
             }
         } catch (e: Exception) {
             println(e)
-            return null
+            null
         }
     }
 
@@ -41,12 +43,13 @@ class DbHallRepo(private val url: String,
                           sort: List<String>): Collection<Hall> {
         val sql = "SELECT id, cinema, name FROM hall WHERE cinema=? LIMIT ? OFFSET ?"
         return try {
-            DriverManager.getConnection(url, props).use { it ->
-                it.prepareStatement(sql).apply {
-                    setInt(1, cinema)
-                    setInt(2, page.limit)
-                    setInt(3, page.offset)
-                }.executeQuery().collect(emptyList())
+            DriverManager.getConnection(url, props).use { connection ->
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setInt(1, cinema)
+                    ps.setInt(2, page.limit)
+                    ps.setInt(3, page.offset)
+                    ps.executeQuery().use { it.collect(emptyList()) }
+                }
             }
         } catch (e: Exception) {
             println(e)
@@ -56,11 +59,12 @@ class DbHallRepo(private val url: String,
 
     private fun queryHall(id: Int, sql: String): Hall? {
         return try {
-            DriverManager.getConnection(url, props).use { it ->
-                it.prepareStatement(sql).apply {
-                    setInt(1, id)
-                }.executeQuery().let {
-                    if (it.next()) Hall(id, it.getInt(1), it.getString(2)) else null
+            DriverManager.getConnection(url, props).use { connection ->
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setInt(1, id)
+                    ps.executeQuery().use { rs ->
+                        if (rs.next()) Hall(id, rs.getInt(1), rs.getString(2)) else null
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -79,28 +83,7 @@ class DbHallRepo(private val url: String,
         return queryHall(id, sql)
     }
 
-    override fun clear() {
-        val sql = "DELETE FROM hall"
-        try {
-            DriverManager.getConnection(url, props).use {
-                it.createStatement().executeUpdate(sql)
-            }
-        } catch (e: Exception) {
-            println(e)
-        }
-    }
+    override fun clear() = clear("DELETE FROM hall")
 
-    override fun total(): Int {
-        val sql = "SELECT COUNT(*) FROM hall"
-        return try {
-            DriverManager.getConnection(url, props).use { connection ->
-                connection.createStatement().executeQuery(sql).let { rs ->
-                    if (rs.next()) rs.getInt(1) else 0
-                }
-            }
-        } catch (e: Exception) {
-            println(e)
-            0
-        }
-    }
+    override fun total() = total("SELECT COUNT(*) FROM hall")
 }

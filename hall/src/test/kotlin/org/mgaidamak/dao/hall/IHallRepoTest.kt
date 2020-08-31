@@ -24,13 +24,13 @@ abstract class IHallRepoTest(private val repo: IHallRepo,
     private fun createCinema(): Int {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        return crepo.createCinema(cinema)?.id ?: 0
+        return assertNotNull(crepo.createCinema(cinema)).id
     }
 
     @Test
     open fun `create hall`() {
         val cinemaId = createCinema()
-        repo.createHall(Hall(cinema = cinemaId, name = "Big"))
+        assertNotNull(repo.createHall(Hall(cinema = cinemaId, name = "Big")))
         assertEquals(1, repo.total())
     }
 
