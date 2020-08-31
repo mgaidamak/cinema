@@ -15,5 +15,7 @@ CREATE TABLE IF NOT EXISTS hall (
 CREATE TABLE IF NOT EXISTS seat (
     id SERIAL PRIMARY KEY,
     hall integer REFERENCES hall (id) ON DELETE CASCADE,
-    name text
+    x integer NOT NULL CHECK (x > 0),
+    y integer NOT NULL CHECK (y > 0),
+    UNIQUE (hall, x, y)
 );

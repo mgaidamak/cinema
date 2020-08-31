@@ -4,7 +4,7 @@ import org.mgaidamak.dao.Hall
 import org.mgaidamak.dao.Page
 
 /**
- * DAO for Hall at Hall list
+ * DAO for Hall at Cinema list
  */
 interface IHallRepo {
     fun createHall(hall: Hall): Hall?

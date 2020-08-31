@@ -5,6 +5,7 @@ import org.mgaidamak.dao.Page
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -21,8 +22,8 @@ abstract class ICinemaRepoTest(private val repo: ICinemaRepo) {
     open fun `create cinema`() {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        repo.createCinema(cinema)
-        repo.createCinema(cinema)
+        assertNotNull(repo.createCinema(cinema))
+        assertNotNull(repo.createCinema(cinema))
         assertEquals(2, repo.total())
     }
 
@@ -30,13 +31,10 @@ abstract class ICinemaRepoTest(private val repo: ICinemaRepo) {
     fun `list cinemas`() {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        val first = repo.createCinema(cinema)
-        println("Created first $first")
-        val second = repo.createCinema(cinema)
-        println("Created second $second")
+        val first = assertNotNull(repo.createCinema(cinema))
+        val second = assertNotNull(repo.createCinema(cinema))
         val expected = listOf(first, second)
         val found = repo.getCinemas()
-        println("Found list $found")
         assertTrue { found.containsAll(expected) }
         assertEquals(expected.size, found.size)
     }
@@ -45,10 +43,8 @@ abstract class ICinemaRepoTest(private val repo: ICinemaRepo) {
     fun `list cinemas page`() {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        val first = repo.createCinema(cinema)
-        println("Created first $first")
-        val second = repo.createCinema(cinema)
-        println("Created first $second")
+        assertNotNull(repo.createCinema(cinema))
+        val second = assertNotNull(repo.createCinema(cinema))
         val expected = listOf(second)
         val found = repo.getCinemas(page = Page(1, 2))
         assertTrue { found.containsAll(expected) }
@@ -59,31 +55,31 @@ abstract class ICinemaRepoTest(private val repo: ICinemaRepo) {
     fun `get cinema`() {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        val newOne = repo.createCinema(cinema)
-        assertEquals(newOne, repo.getCinemaById(newOne?.id ?: 0))
+        val first = assertNotNull(repo.createCinema(cinema))
+        assertEquals(first, repo.getCinemaById(first.id))
     }
 
     @Test
     fun `get cinema absent`() {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        val newOne = repo.createCinema(cinema)?.id ?: 0
-        assertNull(repo.getCinemaById(newOne - 1))
+        val first = assertNotNull(repo.createCinema(cinema))
+        assertNull(repo.getCinemaById(first.id - 1))
     }
 
     @Test
     fun `delete cinema`() {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        val newOne = repo.createCinema(cinema)
-        assertEquals(newOne, repo.deleteCinemaById(newOne?.id ?: 0))
+        val first = assertNotNull(repo.createCinema(cinema))
+        assertEquals(first, repo.deleteCinemaById(first.id))
     }
 
     @Test
     fun `delete cinema absent`() {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        val newOne = repo.createCinema(cinema)?.id ?: 0
-        assertNull(repo.deleteCinemaById(newOne - 1))
+        val first = assertNotNull(repo.createCinema(cinema))
+        assertNull(repo.deleteCinemaById(first.id - 1))
     }
 }

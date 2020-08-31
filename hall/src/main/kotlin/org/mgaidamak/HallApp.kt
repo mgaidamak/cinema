@@ -3,7 +3,9 @@ package org.mgaidamak
 import com.typesafe.config.ConfigFactory
 import io.ktor.application.*
 import io.ktor.config.HoconApplicationConfig
+import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
+import io.ktor.features.StatusPages
 import io.ktor.http.*
 import io.ktor.gson.*
 import io.ktor.response.*
@@ -37,6 +39,12 @@ fun main(args: Array<String>) {
 fun Application.cinema(repo: ICinemaRepo) {
     install(ContentNegotiation) {
         gson {
+        }
+    }
+    // TODO install(CallLogging)
+    install(StatusPages) {
+        exception<Throwable> { cause ->
+            call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
         }
     }
     routing {

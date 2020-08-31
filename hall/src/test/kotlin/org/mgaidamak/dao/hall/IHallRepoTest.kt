@@ -7,6 +7,7 @@ import org.mgaidamak.dao.cinema.ICinemaRepo
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -18,7 +19,6 @@ abstract class IHallRepoTest(private val repo: IHallRepo,
     @BeforeTest
     fun `clean up`() {
         crepo.clear()
-        repo.clear()
     }
 
     private fun createCinema(): Int {
@@ -37,12 +37,10 @@ abstract class IHallRepoTest(private val repo: IHallRepo,
     @Test
     fun `list halls`() {
         val cinemaId = createCinema()
-        val newOne = repo.createHall(Hall(cinema = cinemaId, name = "Big"))
-        val newTwo = repo.createHall(Hall(cinema = cinemaId, name = "Small"))
-        val expected = listOf(newOne, newTwo)
-        println(expected)
+        val first = repo.createHall(Hall(cinema = cinemaId, name = "Big"))
+        val second = repo.createHall(Hall(cinema = cinemaId, name = "Small"))
+        val expected = listOf(first, second)
         val found = repo.getHalls(cinemaId)
-        println(found)
         assertTrue { found.containsAll(expected) }
         assertEquals(expected.size, found.size)
     }
@@ -50,11 +48,9 @@ abstract class IHallRepoTest(private val repo: IHallRepo,
     @Test
     fun `list halls page`() {
         val cinemaId = createCinema()
-        val hall1 = Hall(cinema = cinemaId, name = "Big")
-        val hall2 = Hall(cinema = cinemaId, name = "Small")
-        repo.createHall(hall1)
-        val newTwo = repo.createHall(hall2)
-        val expected = listOf(newTwo)
+        repo.createHall(Hall(cinema = cinemaId, name = "Big"))
+        val second = repo.createHall(Hall(cinema = cinemaId, name = "Small"))
+        val expected = listOf(second)
         val found = repo.getHalls(cinemaId, page = Page(1, 2))
         assertTrue { found.containsAll(expected) }
         assertEquals(expected.size, found.size)
@@ -63,28 +59,28 @@ abstract class IHallRepoTest(private val repo: IHallRepo,
     @Test
     fun `get hall`() {
         val cinemaId = createCinema()
-        val newOne = repo.createHall(Hall(cinema = cinemaId, name = "Big"))
-        assertEquals(newOne, repo.getHallById(newOne?.id ?: -1))
+        val first = assertNotNull(repo.createHall(Hall(cinema = cinemaId, name = "Big")))
+        assertEquals(first, repo.getHallById(first.id))
     }
 
     @Test
     fun `get hall absent`() {
         val cinemaId = createCinema()
-        val newOne = repo.createHall(Hall(cinema = cinemaId, name = "Big"))
-        assertNull(repo.getHallById(newOne?.let { it.id - 1 } ?: -1))
+        val first = assertNotNull(repo.createHall(Hall(cinema = cinemaId, name = "Big")))
+        assertNull(repo.getHallById(first.id - 1))
     }
 
     @Test
     fun `delete cinema`() {
         val cinemaId = createCinema()
-        val newOne = repo.createHall(Hall(cinema = cinemaId, name = "Big"))
-        assertEquals(newOne, repo.deleteHallById(newOne?.id ?: -1))
+        val first = assertNotNull(repo.createHall(Hall(cinema = cinemaId, name = "Big")))
+        assertEquals(first, repo.deleteHallById(first.id))
     }
 
     @Test
     fun `delete cinema absent`() {
         val cinemaId = createCinema()
-        val newOne = repo.createHall(Hall(cinema = cinemaId, name = "Big"))
-        assertNull(repo.deleteHallById(newOne?.let { it.id - 1 } ?: -1))
+        val first = assertNotNull(repo.createHall(Hall(cinema = cinemaId, name = "Big")))
+        assertNull(repo.deleteHallById(first.id - 1))
     }
 }
