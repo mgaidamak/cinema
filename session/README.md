@@ -18,4 +18,4 @@
 2. FilmID (REFERENCES Film)
 3. HallID
 4. Date (дата начала сеанса в нулевом часовом поясе)
-5. TariffID
+5. Price (единая цена на все места)

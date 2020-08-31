@@ -1,4 +1,4 @@
-package org.mgaidamak
+package org.mgaidamak.cinema.session
 
 import com.typesafe.config.ConfigFactory
 import io.ktor.application.*
@@ -13,6 +13,7 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.util.KtorExperimentalAPI
+import org.mgaidamak.cinema.session.dao.film.IFilmRepo
 import org.mgaidamak.dao.cinema.DbCinemaRepo
 import org.mgaidamak.dao.cinema.ICinemaRepo
 import java.util.Properties
@@ -31,12 +32,12 @@ fun main(args: Array<String>) {
             setProperty("user", config.property("postgres.user").getString())
             setProperty("password", config.property("postgres.password").getString())
         }
-        module { cinema(DbCinemaRepo(url, props)) }
+        module { film(DbFilmRepo(url, props)) }
     }
     embeddedServer(Netty, env).start(true)
 }
 
-fun Application.cinema(repo: ICinemaRepo) {
+fun Application.film(repo: IFilmRepo) {
     install(ContentNegotiation) {
         gson {
         }
@@ -51,8 +52,8 @@ fun Application.cinema(repo: ICinemaRepo) {
         get("/") {
             call.respondText("My Hall App", ContentType.Text.Html)
         }
-        HallApiServer(repo).apply {
-            registerCinema()
+        SessionApiServer(repo).apply {
+            registerFilm()
         }
     }
 }

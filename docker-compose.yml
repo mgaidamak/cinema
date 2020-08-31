@@ -18,7 +18,7 @@ services:
   hall:
     image: cinema-hall
     environment:
-      - SQLURL=jdbc:postgresql://postgresql:5432/hall
+      - HALLSQL=jdbc:postgresql://postgresql:5432/hall
     ports:
       # host:container
       - "8081:8080"
