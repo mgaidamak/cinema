@@ -37,6 +37,12 @@ paths:
       description: Get all cinemas
       operationId: getCinemas
       parameters:
+      - name: city
+        in: query
+        description: Search at city
+        required: false
+        schema:
+          type: string
       - name: sort
         in: query
         description: Fields to sort

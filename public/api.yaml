@@ -1,0 +1,257 @@
+openapi: 3.0.0
+info:
+  title: Cinema API
+  description: Public API for Customer
+  version: 1.0.0
+  contact:
+    name: Mikhail Gaidamaka
+    url: https://github.com/mgaidamak
+    email: magnoly.nsk@gmail.com
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /public/cinema/:
+    get:
+      tags:
+        - cinema
+      summary: Get all cinemas
+      description: Get all cinemas
+      operationId: getCinemas
+      parameters:
+        - name: city
+          in: query
+          description: Search at city
+          required: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Fields to sort
+          required: false
+          schema:
+            type: array
+            items:
+              format: string
+        - name: page
+          in: query
+          description: Offset-based strategy pagination
+          schema:
+            $ref: '#/components/schemas/Page'
+      responses:
+        200:
+          description: List of cinema
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cinema'
+  /public/session/:
+    get:
+      tags:
+        - public
+      summary: Search sessions
+      description: Search sessions at selected cinema
+      operationId: searchSession
+      parameters:
+        - name: cinema
+          in: query
+          description: Selected cinema
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: date
+          in: query
+          description: Selected date
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          description: Offset-based strategy pagination
+          schema:
+            $ref: '#/components/schemas/Page'
+      responses:
+        200:
+          description: List of session
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+  /public/seat/:
+    get:
+      tags:
+        - public
+      summary: Search seats
+      description: Search sessions at selected cinema
+      operationId: searchSession
+      parameters:
+        - name: session
+          in: query
+          description: Selected session
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: List of seats
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Seat'
+  /public/order/:
+    post:
+      tags:
+      - public
+      summary: Create new order
+      description: Create new order
+      operationId: orderTicket
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        200:
+          description: Cinema has been created
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Order'
+
+  /cinema/{id}:
+    get:
+      tags:
+      - cinema
+      summary: Get cinema by ID
+      description: Get cinema by ID
+      operationId: getCinemaById
+      parameters:
+      - name: id
+        in: path
+        description: ID of cinema
+        required: true
+        schema: 
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: Cinema associated with ID
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Cinema'
+        400:
+          description: Invalid id (not Long)
+        404:
+          description: Cinema not found
+    delete:
+      tags:
+        - cinema
+      summary: Delete cinema by ID
+      description: Delete cinema by ID
+      operationId: deleteCinemaById
+      parameters:
+        - name: id
+          in: path
+          description: ID of cinema
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: Previous cinema associated with ID
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cinema'
+        400:
+          description: Invalid id (not Long)
+        404:
+          description: Cinema not found
+
+components:
+  schemas:
+    Cinema:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+    Session:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        film:
+          type: integer
+          format: int32
+        hall:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date-time
+        price:
+          type: integer
+          format: int32
+    Seat:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        x:
+          type: integer
+          format: int32
+        y:
+          type: integer
+          format: int32
+        status:
+          type: integer
+          format: int32
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        customer:
+          type: integer
+          format: int32
+        session:
+          type: integer
+          format: int32
+        status:
+          type: integer
+          format: int32
+        seats:
+          type: array
+          items:
+            format: int32
+    Page:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
