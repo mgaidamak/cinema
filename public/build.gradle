@@ -1,0 +1,16 @@
+description = 'Public application'
+
+dependencies {
+    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "io.ktor:ktor-gson:$ktor_version"
+    testCompile "io.ktor:ktor-server-test-host:$ktor_version"
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "org.mgaidamak.cinema.public.PublicAppKt"
+    }
+}
+
+shadowJar {
+}

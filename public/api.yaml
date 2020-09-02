@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Cinema API
+  title: Public API
   description: Public API for Customer
   version: 1.0.0
   contact:
@@ -13,7 +13,7 @@ paths:
   /public/cinema/:
     get:
       tags:
-        - cinema
+        - public
       summary: Get all cinemas
       description: Get all cinemas
       operationId: getCinemas
@@ -125,39 +125,13 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Order'
-
-  /cinema/{id}:
+  /public/order/{id}:
     get:
       tags:
-      - cinema
-      summary: Get cinema by ID
-      description: Get cinema by ID
-      operationId: getCinemaById
-      parameters:
-      - name: id
-        in: path
-        description: ID of cinema
-        required: true
-        schema: 
-          type: integer
-          format: int32
-      responses:
-        200:
-          description: Cinema associated with ID
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/Cinema'
-        400:
-          description: Invalid id (not Long)
-        404:
-          description: Cinema not found
-    delete:
-      tags:
-        - cinema
-      summary: Delete cinema by ID
-      description: Delete cinema by ID
-      operationId: deleteCinemaById
+        - public
+      summary: Get order by ID
+      description: Get order by ID
+      operationId: getOrderById
       parameters:
         - name: id
           in: path
@@ -168,17 +142,44 @@ paths:
             format: int32
       responses:
         200:
-          description: Previous cinema associated with ID
+          description: Previous order associated with ID
           content:
             'application/json':
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Cinema'
+                  $ref: '#/components/schemas/Order'
         400:
           description: Invalid id (not Long)
         404:
-          description: Cinema not found
+          description: Order not found
+    delete:
+      tags:
+        - public
+      summary: Delete order by ID
+      description: Delete order by ID
+      operationId: deleteOrderById
+      parameters:
+        - name: id
+          in: path
+          description: ID of cinema
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: Previous order associated with ID
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        400:
+          description: Invalid id (not Long)
+        404:
+          description: Order not found
 
 components:
   schemas:
@@ -245,7 +246,7 @@ components:
         seats:
           type: array
           items:
-            format: int32
+            $ref: '#/components/schemas/Seat'
     Page:
       type: object
       properties:
