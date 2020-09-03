@@ -14,13 +14,15 @@
 Параметры заказа
 1. ID (autoincrement)
 2. CustomerID
-3. Status
+3. SessionID
+4. Status (0 new, 1 accepted, 2 rejected)
+5. Total
 
-Таблица мест в зале представляет собой таблицу, в которой выполняется
-только вставка данных и последнее сообщение и представляет собой
-актуальный статус места.
+Таблица мест в зале представляет собой таблицу, с уникальным ключом 
+(SessionID, SeatID), что запрещает продавать одно место два раза.
+В случае отмены заказа записи удаляются.
 1. ID (autoincrement)
 2. OrderID (REFERENCES Order)
 3. SessionID
 4. SeatID
-5. Status (Sold, Reserved)
+5. Status (0 Reserved, 1 Sold)

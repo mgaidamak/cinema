@@ -17,14 +17,21 @@ data class Hall(
     val id: Int = 0,
     val cinema: Int,
     val name: String
-)
+) {
+    constructor(set: ResultSet): this(set.getInt(1),
+        set.getInt(2), set.getString(3))
+}
 
 data class Seat(
     val id: Int = 0,
     val hall: Int,
     val x: Int,
     val y: Int
-)
+) {
+    constructor(set: ResultSet): this(set.getInt(1),
+        set.getInt(2), set.getInt(3),
+        set.getInt(4))
+}
 
 data class Page(
     val offset: Int,

@@ -12,7 +12,9 @@ import java.util.Properties
  * Production ready repository on PostgreSQL
  */
 class DbCinemaRepo(url: String,
-                   props: Properties = Properties()): DbRepo(url, props), ICinemaRepo {
+                   props: Properties = Properties()): DbRepo<Cinema>(url, props), ICinemaRepo {
+
+    override fun form(rs: ResultSet) = Cinema(rs)
 
     override fun createCinema(cinema: Cinema): Cinema? {
         val sql = """INSERT INTO cinema (name, city, address, timezone)
@@ -35,8 +37,6 @@ class DbCinemaRepo(url: String,
         }
     }
 
-    private tailrec fun ResultSet.collect(list: List<Cinema>): List<Cinema>
-        = if (!next()) list else collect(list.plus(Cinema(this)))
 
     private fun getCinemas(page: Page, sort: List<String>): Collection<Cinema> {
         val sql = "SELECT id, name, city, address, timezone FROM cinema LIMIT ? OFFSET ?"
@@ -74,30 +74,14 @@ class DbCinemaRepo(url: String,
         }
     }
 
-    private fun queryCinema(id: Int, sql: String): Cinema? {
-        return try {
-            DriverManager.getConnection(url, props).use { connection ->
-                connection.prepareStatement(sql).use { ps ->
-                    ps.setInt(1, id)
-                    ps.executeQuery().use { rs ->
-                        if (rs.next()) Cinema(rs) else null
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            println(e)
-            null
-        }
-    }
-
     override fun getCinemaById(id: Int): Cinema? {
         val sql = "SELECT id, name, city, address, timezone FROM cinema WHERE id = ?"
-        return queryCinema(id, sql)
+        return single(id, sql)
     }
 
     override fun deleteCinemaById(id: Int): Cinema? {
         val sql = "DELETE FROM cinema WHERE id = ? RETURNING id, name, city, address, timezone"
-        return queryCinema(id, sql)
+        return single(id, sql)
     }
 
     override fun clear() = clear("DELETE FROM cinema")

@@ -55,7 +55,7 @@ abstract class ICinemaRepoTest(private val repo: ICinemaRepo) {
     fun `list cinemas city`() {
         val nsk = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")
-        val first = assertNotNull(repo.createCinema(nsk))
+        assertNotNull(repo.createCinema(nsk))
         val tmsk = Cinema(name = "Cosmos", city = "Tomsk",
             address = "Lenina 2", timezone = "Asia/Novosibirsk")
         val second = assertNotNull(repo.createCinema(tmsk))

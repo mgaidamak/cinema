@@ -1,4 +1,4 @@
-package org.mgaidamak.dao
+package org.mgaidamak.cinema.ticket.dao
 
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -18,7 +18,7 @@ abstract class DbRepo<T>(val url: String,
                 connection.createStatement().use { it.executeUpdate(sql) }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            println(e)
         }
     }
 
@@ -32,7 +32,7 @@ abstract class DbRepo<T>(val url: String,
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            println(e)
             0
         }
     }
