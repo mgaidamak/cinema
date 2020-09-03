@@ -8,6 +8,7 @@ import org.mgaidamak.cinema.ticket.dao.Page
  */
 interface IOrderRepo {
     fun createOrder(order: Order): Order?
+    fun updateOrder(order: Order): Order?
     fun getOrders(page: Page = Page(0, 10),
                   sort: List<String> = emptyList()): Collection<Order>
     fun getOrderById(id: Int): Order?

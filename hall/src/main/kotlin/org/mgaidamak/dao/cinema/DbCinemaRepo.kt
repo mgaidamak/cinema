@@ -27,7 +27,7 @@ class DbCinemaRepo(url: String,
                     ps.setString(3, cinema.address)
                     ps.setString(4, cinema.timezone)
                     ps.executeQuery().use { rs ->
-                        if (rs.next()) Cinema(rs) else null
+                        if (rs.next()) form(rs) else null
                     }
                 }
             }

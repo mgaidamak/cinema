@@ -37,6 +37,10 @@ class DbOrderRepo(url: String,
         }
     }
 
+    override fun updateOrder(order: Order): Order? {
+        TODO("Not yet implemented")
+    }
+
     override fun getOrders(page: Page, sort: List<String>): Collection<Order> {
         val sql = "SELECT id, customer, session, status, total FROM order LIMIT ? OFFSET ?"
         return try {
@@ -63,7 +67,7 @@ class DbOrderRepo(url: String,
         return single(id, sql)
     }
 
-    override fun clear() = clear("DELETE FROM cinema")
+    override fun clear() = clear("DELETE FROM order")
 
-    override fun total() = total("SELECT COUNT(*) FROM cinema")
+    override fun total() = total("SELECT COUNT(*) FROM order")
 }
