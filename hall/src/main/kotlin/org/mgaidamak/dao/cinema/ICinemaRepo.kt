@@ -8,7 +8,8 @@ import org.mgaidamak.dao.Page
  */
 interface ICinemaRepo {
     fun createCinema(cinema: Cinema): Cinema?
-    fun getCinemas(page: Page = Page(0, 10),
+    fun getCinemas(city: String? = null,
+                   page: Page = Page(0, 10),
                    sort: List<String> = emptyList()): Collection<Cinema>
     fun getCinemaById(id: Int): Cinema?
     fun deleteCinemaById(id: Int): Cinema?

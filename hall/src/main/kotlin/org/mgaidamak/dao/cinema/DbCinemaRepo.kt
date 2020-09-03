@@ -15,7 +15,8 @@ class DbCinemaRepo(url: String,
                    props: Properties = Properties()): DbRepo(url, props), ICinemaRepo {
 
     override fun createCinema(cinema: Cinema): Cinema? {
-        val sql = "INSERT INTO cinema (name, city, address, timezone) VALUES (?, ?, ?, ?) RETURNING id"
+        val sql = """INSERT INTO cinema (name, city, address, timezone)
+                     VALUES (?, ?, ?, ?) RETURNING id, name, city, address, timezone"""
         return try {
             DriverManager.getConnection(url, props).use { connection ->
                 connection.prepareStatement(sql).use { ps ->
@@ -24,9 +25,7 @@ class DbCinemaRepo(url: String,
                     ps.setString(3, cinema.address)
                     ps.setString(4, cinema.timezone)
                     ps.executeQuery().use { rs ->
-                        if (rs.next()) rs.getInt(1) else null
-                    }?.let {
-                        Cinema(it, cinema.name, cinema.city, cinema.address, cinema.timezone)
+                        if (rs.next()) Cinema(rs) else null
                     }
                 }
             }
@@ -37,10 +36,9 @@ class DbCinemaRepo(url: String,
     }
 
     private tailrec fun ResultSet.collect(list: List<Cinema>): List<Cinema>
-        = if (!next()) list else collect(list.plus(Cinema(getInt(1), getString(2),
-        getString(3), getString(4), getString(5))))
+        = if (!next()) list else collect(list.plus(Cinema(this)))
 
-    override fun getCinemas(page: Page, sort: List<String>): Collection<Cinema> {
+    private fun getCinemas(page: Page, sort: List<String>): Collection<Cinema> {
         val sql = "SELECT id, name, city, address, timezone FROM cinema LIMIT ? OFFSET ?"
         return try {
             DriverManager.getConnection(url, props).use { connection ->
@@ -56,14 +54,33 @@ class DbCinemaRepo(url: String,
         }
     }
 
+    override fun getCinemas(city: String?, page: Page, sort: List<String>): Collection<Cinema> {
+        if (city == null) return getCinemas(page, sort)
+        val sql = """SELECT id, name, city, address, timezone FROM cinema 
+                     WHERE city ILIKE '%' || ? || '%'
+                     LIMIT ? OFFSET ?"""
+        return try {
+            DriverManager.getConnection(url, props).use { connection ->
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setString(1, city)
+                    ps.setInt(2, page.limit)
+                    ps.setInt(3, page.offset)
+                    ps.executeQuery().use { it.collect(emptyList()) }
+                }
+            }
+        } catch (e: Exception) {
+            println(e)
+            emptyList()
+        }
+    }
+
     private fun queryCinema(id: Int, sql: String): Cinema? {
         return try {
             DriverManager.getConnection(url, props).use { connection ->
                 connection.prepareStatement(sql).use { ps ->
                     ps.setInt(1, id)
                     ps.executeQuery().use { rs ->
-                        if (rs.next()) Cinema(id, rs.getString(1), rs.getString(2),
-                            rs.getString(3), rs.getString(4)) else null
+                        if (rs.next()) Cinema(rs) else null
                     }
                 }
             }
@@ -74,12 +91,12 @@ class DbCinemaRepo(url: String,
     }
 
     override fun getCinemaById(id: Int): Cinema? {
-        val sql = "SELECT name, city, address, timezone FROM cinema WHERE id = ?"
+        val sql = "SELECT id, name, city, address, timezone FROM cinema WHERE id = ?"
         return queryCinema(id, sql)
     }
 
     override fun deleteCinemaById(id: Int): Cinema? {
-        val sql = "DELETE FROM cinema WHERE id = ? RETURNING name, city, address, timezone"
+        val sql = "DELETE FROM cinema WHERE id = ? RETURNING id, name, city, address, timezone"
         return queryCinema(id, sql)
     }
 

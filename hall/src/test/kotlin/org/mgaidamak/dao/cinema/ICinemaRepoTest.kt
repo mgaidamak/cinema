@@ -52,6 +52,20 @@ abstract class ICinemaRepoTest(private val repo: ICinemaRepo) {
     }
 
     @Test
+    fun `list cinemas city`() {
+        val nsk = Cinema(name = "Pobeda", city = "Novosibirsk",
+            address = "Lenina 1", timezone = "Asia/Novosibirsk")
+        val first = assertNotNull(repo.createCinema(nsk))
+        val tmsk = Cinema(name = "Cosmos", city = "Tomsk",
+            address = "Lenina 2", timezone = "Asia/Novosibirsk")
+        val second = assertNotNull(repo.createCinema(tmsk))
+        val expected = listOf(second)
+        val found = repo.getCinemas("Tomsk")
+        assertTrue { found.containsAll(expected) }
+        assertEquals(expected.size, found.size)
+    }
+
+    @Test
     fun `get cinema`() {
         val cinema = Cinema(name = "Pobeda", city = "Novosibirsk",
             address = "Lenina 1", timezone = "Asia/Novosibirsk")

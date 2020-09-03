@@ -23,9 +23,10 @@ class HallApiServer(val repo: ICinemaRepo) {
 
         get("/cinema/") {
             println("Get ${call.request.uri}")
+            val city = call.parameters["city"]
             val page = Page(0, 10)
             val sort = listOf("id")
-            repo.getCinemas(page, sort).also { call.respond(it) }
+            repo.getCinemas(page = page, sort = sort).also { call.respond(it) }
         }
 
         get("/cinema/{id}") {

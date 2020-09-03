@@ -19,9 +19,10 @@ class FileCinemaRepo: ICinemaRepo {
         return newOne
     }
 
-    override fun getCinemas(page: Page, sort: List<String>): Collection<Cinema> {
+    override fun getCinemas(city: String?, page: Page, sort: List<String>): Collection<Cinema> {
         // TODO sorting
         return map.values.stream()
+            .filter { c -> city?.let { c.city.contains(city, true) } ?: true }
             .skip(page.offset.toLong())
             .limit(page.limit.toLong()).toList()
     }

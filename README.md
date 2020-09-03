@@ -41,7 +41,9 @@ docker-контейнер).
 11. Разобраться с обработкой исключений (install StatusPages)
 12. Разобраться с логированием запросов (install CallLogging)
 13. Добавить метрики
-14. Добавить jib для сборка контейнеров в java
+14. Попробовать [jib](https://github.com/GoogleContainerTools/jib) для сборки контейнеров
+15. Попробовать [kotest](https://github.com/kotest/kotest)
+16. Добавить везде конструкторы ResultSet
 
 ### Пользовательские сценарии
 
