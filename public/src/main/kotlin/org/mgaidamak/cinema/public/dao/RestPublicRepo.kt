@@ -15,15 +15,15 @@ class RestPublicRepo(val url: String): IPublicRepo {
         TODO("Not yet implemented")
     }
 
-    override fun getOrder(id: Int): Order? {
+    override fun getBill(id: Int): Bill? {
         TODO("Not yet implemented")
     }
 
-    override fun postOrder(order: Order): Order? {
+    override fun postBill(bill: Bill): Bill? {
         TODO("Not yet implemented")
     }
 
-    override fun deleteOrder(order: Int): Order? {
+    override fun deleteBill(id: Int): Bill? {
         TODO("Not yet implemented")
     }
 }

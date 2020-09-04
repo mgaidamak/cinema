@@ -24,7 +24,7 @@ data class Seat(
     val status: Int
 )
 
-data class Order(
+data class Bill(
     val id: Int = 0,
     val customer: Int,
     val session: Int,

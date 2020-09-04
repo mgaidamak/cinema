@@ -53,6 +53,11 @@ class DbSeatRepo(url: String,
         }
     }
 
+    override fun getSeatById(id: Int): Seat? {
+        val sql = "SELECT id, hall, x, y FROM seat WHERE id = ?"
+        return single(id, sql)
+    }
+
     override fun deleteSeatById(id: Int): Seat? {
         val sql = "DELETE FROM seat WHERE id = ? RETURNING id, hall, x, y"
         return single(id, sql)

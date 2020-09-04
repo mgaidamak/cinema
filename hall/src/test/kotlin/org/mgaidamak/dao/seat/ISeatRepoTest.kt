@@ -78,6 +78,22 @@ abstract class ISeatRepoTest(private val repo: ISeatRepo,
     }
 
     @Test
+    fun `get seat`() {
+        val cinemaId = createCinema()
+        val hallId = createHall(cinemaId)
+        val first = assertNotNull(repo.createSeat(Seat(hall = hallId, x = 1, y = 1)))
+        assertEquals(first, repo.getSeatById(first.id))
+    }
+
+    @Test
+    fun `get seat absent`() {
+        val cinemaId = createCinema()
+        val hallId = createHall(cinemaId)
+        val first = assertNotNull(repo.createSeat(Seat(hall = hallId, x = 1, y = 1)))
+        assertNull(repo.getSeatById(first.id - 1))
+    }
+
+    @Test
     fun `delete seat`() {
         val cinemaId = createCinema()
         val hallId = createHall(cinemaId)

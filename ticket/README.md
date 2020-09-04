@@ -8,10 +8,10 @@
 Информация хранится в PostgreSQL `Ticket`.
 
 Вся информация о билетах хранится в таблицах:
-1. Заказы (Order)
+1. Счета (Bill)
 2. Места в зале (Seat) и их статус (Sold, Reserved)
 
-Параметры заказа
+Параметры счета
 1. ID (autoincrement)
 2. CustomerID
 3. SessionID
@@ -20,9 +20,9 @@
 
 Таблица мест в зале представляет собой таблицу, с уникальным ключом 
 (SessionID, SeatID), что запрещает продавать одно место два раза.
-В случае отмены заказа записи удаляются.
+В случае отмены счета записи удаляются.
 1. ID (autoincrement)
-2. OrderID (REFERENCES Order)
+2. OrderID (REFERENCES Bill)
 3. SessionID
 4. SeatID
 5. Status (0 Reserved, 1 Sold)

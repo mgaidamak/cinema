@@ -29,7 +29,6 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Cinema'
-  /cinema/:
     get:
       tags:
       - cinema
@@ -79,7 +78,7 @@ paths:
         required: true
         schema: 
           type: integer
-          format: int64
+          format: int32
       responses:
         200:
           description: Cinema associated with ID
@@ -104,7 +103,7 @@ paths:
           required: true
           schema:
             type: integer
-            format: int64
+            format: int32
       responses:
         200:
           description: Previous cinema associated with ID
@@ -119,6 +118,296 @@ paths:
         404:
           description: Cinema not found
 
+  /cinema/{cinema}/hall:
+    post:
+      tags:
+        - cinema
+      summary: Create new hall
+      description: Create new hall
+      operationId: createHall
+      parameters:
+        - name: cinema
+          in: path
+          description: Search at cinema
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Hall'
+      responses:
+        200:
+          description: Hall has been created
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Hall'
+    get:
+      tags:
+        - cinema
+      summary: Get all halls
+      description: Get all halls
+      operationId: getHalls
+      parameters:
+        - name: cinema
+          in: path
+          description: Search at cinema
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: sort
+          in: query
+          description: Fields to sort
+          required: false
+          schema:
+            type: array
+            items:
+              format: string
+        - name: page
+          in: query
+          description: Offset-based strategy pagination
+          schema:
+            $ref: '#/components/schemas/Page'
+      responses:
+        200:
+          description: List of halls
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Hall'
+  /cinema/{cinema}/hall/{id}:
+    get:
+      tags:
+        - cinema
+      summary: Get cinema by ID
+      description: Get cinema by ID
+      operationId: getCinemaById
+      parameters:
+        - name: cinema
+          in: path
+          description: ID of cinema
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: id
+          in: path
+          description: ID of hall
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: Hall associated with ID
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Hall'
+        400:
+          description: Invalid id (not Long)
+        404:
+          description: Hall not found
+    delete:
+      tags:
+        - cinema
+      summary: Delete hall by ID
+      description: Delete hall by ID
+      operationId: deleteHallById
+      parameters:
+        - name: cinema
+          in: path
+          description: ID of cinema
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: id
+          in: path
+          description: ID of hall
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: Previous hall associated with ID
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Hall'
+        400:
+          description: Invalid id (not Long)
+        404:
+          description: Hall not found
+
+  /cinema/{cinema}/hall/{hall}/seat:
+    post:
+      tags:
+        - cinema
+      summary: Create new seat
+      description: Create new seat
+      operationId: createSeat
+      parameters:
+        - name: cinema
+          in: path
+          description: Search at cinema
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: hall
+          in: path
+          description: Search at hall
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Seat'
+      responses:
+        200:
+          description: Seat has been created
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Seat'
+    get:
+      tags:
+        - cinema
+      summary: Get all seats
+      description: Get all seats
+      operationId: getSeats
+      parameters:
+        - name: cinema
+          in: path
+          description: Search at cinema
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: hall
+          in: path
+          description: Search at hall
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: sort
+          in: query
+          description: Fields to sort
+          required: false
+          schema:
+            type: array
+            items:
+              format: string
+        - name: page
+          in: query
+          description: Offset-based strategy pagination
+          schema:
+            $ref: '#/components/schemas/Page'
+      responses:
+        200:
+          description: List of halls
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Hall'
+  /cinema/{cinema}/hall/{hall}/seat/{id}:
+    get:
+      tags:
+        - cinema
+      summary: Get seat by ID
+      description: Get seat by ID
+      operationId: getSeatById
+      parameters:
+        - name: cinema
+          in: path
+          description: ID of cinema
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: hall
+          in: path
+          description: Search at hall
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: id
+          in: path
+          description: ID of seat
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: Seat associated with ID
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Hall'
+        400:
+          description: Invalid id (not Long)
+        404:
+          description: Seat not found
+    delete:
+      tags:
+        - cinema
+      summary: Delete seat by ID
+      description: Delete seat by ID
+      operationId: deleteSeatById
+      parameters:
+        - name: cinema
+          in: path
+          description: ID of cinema
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: hall
+          in: path
+          description: Search at hall
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: id
+          in: path
+          description: ID of seat
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: Previous seat associated with ID
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Seat'
+        400:
+          description: Invalid id (not Long)
+        404:
+          description: Seat not found
+
 components:
   schemas:
     Cinema:
@@ -126,7 +415,7 @@ components:
       properties:
         id:
           type: integer
-          format: int64
+          format: int32
         name:
           type: string
         city:
@@ -145,10 +434,10 @@ components:
       properties:
         id:
           type: integer
-          format: int64
+          format: int32
         cinema:
           type: integer
-          format: int64
+          format: int32
         name:
           type: string
       required:
@@ -159,10 +448,10 @@ components:
       properties:
         id:
           type: integer
-          format: int64
+          format: int32
         hall:
           type: integer
-          format: int64
+          format: int32
         x:
           type: integer
           format: int32
@@ -177,47 +466,12 @@ components:
       - x
       - y
       - sector
-    Tariff:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        cinema:
-          type: integer
-          format: int64
-        name:
-          type: string
-        prices:
-          type: array
-          items:
-            $ref: '#/components/schemas/Price'
-      required:
-      - cinema
-      - name
-    Price:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        tariff:
-          type: integer
-          format: int64
-        name:
-          type: string
-        sector:
-          type: integer
-          format: int32
-        price:
-          type: integer
-          format: int32
     Page:
       type: object
       properties:
         offset:
           type: integer
-          format: int64
+          format: int32
         limit:
           type: integer
-          format: int64
+          format: int32
