@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS order (
+CREATE TABLE IF NOT EXISTS bill (
     id SERIAL PRIMARY KEY,
     customer integer,
     session integer,
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS order (
 
 CREATE TABLE IF NOT EXISTS seat (
     id SERIAL PRIMARY KEY,
-    order integer REFERENCES order (id) ON DELETE CASCADE,
+    bill integer REFERENCES bill (id) ON DELETE CASCADE,
     session integer NOT NULL CHECK (session > 0),
     seat integer NOT NULL CHECK (seat > 0),
     status integer,

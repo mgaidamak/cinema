@@ -2,7 +2,7 @@ package org.mgaidamak.cinema.ticket.dao
 
 import java.sql.ResultSet
 
-data class Order(
+data class Bill(
     val id: Int = 0,
     val customer: Int,
     val session: Int,
@@ -15,7 +15,7 @@ data class Order(
 
 data class Seat(
     val id: Int = 0,
-    val order: Int = 0,
+    val bill: Int = 0,
     val session: Int,
     val seat: Int,
     val status: Int

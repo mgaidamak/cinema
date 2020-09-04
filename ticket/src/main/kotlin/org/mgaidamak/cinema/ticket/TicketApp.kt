@@ -12,8 +12,8 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.util.KtorExperimentalAPI
-import org.mgaidamak.cinema.ticket.dao.order.DbOrderRepo
-import org.mgaidamak.cinema.ticket.dao.order.IOrderRepo
+import org.mgaidamak.cinema.ticket.dao.bill.DbBillRepo
+import org.mgaidamak.cinema.ticket.dao.bill.IBillRepo
 import java.util.Properties
 
 @KtorExperimentalAPI
@@ -30,12 +30,12 @@ fun main(args: Array<String>) {
             setProperty("user", config.property("postgres.user").getString())
             setProperty("password", config.property("postgres.password").getString())
         }
-        module { order(DbOrderRepo(url, props)) }
+        module { bill(DbBillRepo(url, props)) }
     }
     embeddedServer(Netty, env).start(true)
 }
 
-fun Application.order(repo: IOrderRepo) {
+fun Application.bill(repo: IBillRepo) {
     install(ContentNegotiation) {
         gson {
         }
