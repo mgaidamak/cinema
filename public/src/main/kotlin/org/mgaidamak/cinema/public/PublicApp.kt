@@ -23,9 +23,7 @@ fun main(args: Array<String>) {
             host = config.property("ktor.deployment.host").getString()
             port = config.property("ktor.deployment.port").getString().toInt()
         }
-
-        val url = config.property("cinema.url").getString()
-        module { public(RestPublicRepo(url)) }
+        module { public(RestPublicRepo(config)) }
     }
     embeddedServer(Netty, env).start(true)
 }

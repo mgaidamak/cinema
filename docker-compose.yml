@@ -28,6 +28,20 @@ services:
       - postgresql
     links:
       - postgresql
+  public:
+    image: cinema-public
+    environment:
+      - HALLHOST=hall
+      - HALLPORT=8080
+    ports:
+      # host:container
+      - "8084:8080"
+    networks:
+      - test_network
+    depends_on:
+      - hall
+    links:
+      - hall
 
 networks:
   test_network:

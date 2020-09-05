@@ -112,6 +112,7 @@ docker-контейнер).
 ```
 ./gradlew shadowJar
 docker build -t cinema-hall hall/
+docker build -t cinema-public public/
 docker-compose up
 ```
 
