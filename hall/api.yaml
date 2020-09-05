@@ -118,21 +118,13 @@ paths:
         404:
           description: Cinema not found
 
-  /cinema/{cinema}/hall:
+  /hall:
     post:
       tags:
         - cinema
       summary: Create new hall
       description: Create new hall
       operationId: createHall
-      parameters:
-        - name: cinema
-          in: path
-          description: Search at cinema
-          required: true
-          schema:
-            type: integer
-            format: int32
       requestBody:
         content:
           'application/json':
@@ -153,7 +145,7 @@ paths:
       operationId: getHalls
       parameters:
         - name: cinema
-          in: path
+          in: query
           description: Search at cinema
           required: true
           schema:
@@ -181,21 +173,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Hall'
-  /cinema/{cinema}/hall/{id}:
+  /hall/{id}:
     get:
       tags:
         - cinema
-      summary: Get cinema by ID
-      description: Get cinema by ID
-      operationId: getCinemaById
+      summary: Get hall by ID
+      description: Get hall by ID
+      operationId: getHallById
       parameters:
-        - name: cinema
-          in: path
-          description: ID of cinema
-          required: true
-          schema:
-            type: integer
-            format: int32
         - name: id
           in: path
           description: ID of hall
@@ -221,13 +206,6 @@ paths:
       description: Delete hall by ID
       operationId: deleteHallById
       parameters:
-        - name: cinema
-          in: path
-          description: ID of cinema
-          required: true
-          schema:
-            type: integer
-            format: int32
         - name: id
           in: path
           description: ID of hall
@@ -249,7 +227,7 @@ paths:
         404:
           description: Hall not found
 
-  /cinema/{cinema}/hall/{hall}/seat:
+  /seat:
     post:
       tags:
         - cinema
@@ -258,14 +236,14 @@ paths:
       operationId: createSeat
       parameters:
         - name: cinema
-          in: path
+          in: query
           description: Search at cinema
           required: true
           schema:
             type: integer
             format: int32
         - name: hall
-          in: path
+          in: query
           description: Search at hall
           required: true
           schema:
@@ -291,14 +269,14 @@ paths:
       operationId: getSeats
       parameters:
         - name: cinema
-          in: path
+          in: query
           description: Search at cinema
           required: true
           schema:
             type: integer
             format: int32
         - name: hall
-          in: path
+          in: query
           description: Search at hall
           required: true
           schema:
@@ -326,7 +304,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Hall'
-  /cinema/{cinema}/hall/{hall}/seat/{id}:
+  /seat/{id}:
     get:
       tags:
         - cinema
@@ -334,20 +312,6 @@ paths:
       description: Get seat by ID
       operationId: getSeatById
       parameters:
-        - name: cinema
-          in: path
-          description: ID of cinema
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - name: hall
-          in: path
-          description: Search at hall
-          required: true
-          schema:
-            type: integer
-            format: int32
         - name: id
           in: path
           description: ID of seat
@@ -361,7 +325,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Hall'
+                $ref: '#/components/schemas/Seat'
         400:
           description: Invalid id (not Long)
         404:
@@ -373,20 +337,6 @@ paths:
       description: Delete seat by ID
       operationId: deleteSeatById
       parameters:
-        - name: cinema
-          in: path
-          description: ID of cinema
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - name: hall
-          in: path
-          description: Search at hall
-          required: true
-          schema:
-            type: integer
-            format: int32
         - name: id
           in: path
           description: ID of seat

@@ -3,7 +3,6 @@ package org.mgaidamak
 import com.typesafe.config.ConfigFactory
 import io.ktor.application.*
 import io.ktor.config.HoconApplicationConfig
-import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
 import io.ktor.http.*
@@ -15,6 +14,10 @@ import io.ktor.server.netty.*
 import io.ktor.util.KtorExperimentalAPI
 import org.mgaidamak.dao.cinema.DbCinemaRepo
 import org.mgaidamak.dao.cinema.ICinemaRepo
+import org.mgaidamak.dao.hall.DbHallRepo
+import org.mgaidamak.dao.hall.IHallRepo
+import org.mgaidamak.dao.seat.DbSeatRepo
+import org.mgaidamak.dao.seat.ISeatRepo
 import java.util.Properties
 
 @KtorExperimentalAPI
@@ -31,7 +34,11 @@ fun main(args: Array<String>) {
             setProperty("user", config.property("postgres.user").getString())
             setProperty("password", config.property("postgres.password").getString())
         }
-        module { cinema(DbCinemaRepo(url, props)) }
+        module {
+            cinema(DbCinemaRepo(url, props))
+            hall(DbHallRepo(url, props))
+            seat(DbSeatRepo(url, props))
+        }
     }
     embeddedServer(Netty, env).start(true)
 }
@@ -48,11 +55,24 @@ fun Application.cinema(repo: ICinemaRepo) {
         }
     }
     routing {
-        get("/") {
-            call.respondText("My Hall App", ContentType.Text.Html)
+        HallApiServer().apply {
+            registerCinema(repo)
         }
-        HallApiServer(repo).apply {
-            registerCinema()
+    }
+}
+
+fun Application.hall(repo: IHallRepo) {
+    routing {
+        HallApiServer().apply {
+            registerHall(repo)
+        }
+    }
+}
+
+fun Application.seat(repo: ISeatRepo) {
+    routing {
+        HallApiServer().apply {
+            registerSeat(repo)
         }
     }
 }

@@ -9,10 +9,16 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.mgaidamak.dao.Cinema
+import org.mgaidamak.dao.cinema.DbCinemaRepo
+import org.mgaidamak.dao.cinema.DbCinemaRepoTest
 import org.mgaidamak.dao.cinema.FileCinemaRepo
+import org.mgaidamak.dao.hall.DbHallRepo
+import org.mgaidamak.dao.hall.FileHallRepo
+import org.mgaidamak.dao.seat.DbSeatRepo
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class HallAppTest {
     @Test
@@ -25,8 +31,7 @@ class HallAppTest {
 
     @BeforeTest
     fun `clean up`() {
-        repo.next.set(0)
-        repo.map.clear()
+        crepo.clear()
     }
 
     @Test
@@ -42,7 +47,7 @@ class HallAppTest {
         }.apply {
             assertEquals(HttpStatusCode.OK, response.status())
             val expected = buildJsonObject {
-                put("id", 1)
+                put("id", crepo.next.get())
                 put("name", "Pobeda")
                 put("city", "Novosibirsk")
                 put("address", "Lenina 1")
@@ -54,12 +59,13 @@ class HallAppTest {
 
     @Test
     fun `get one`() = testApp {
-        repo.map[2] = Cinema(2, "Pobeda", "Novosibirsk", "Lenina 1", "Asia/Novosibirsk")
+        val id = assertNotNull(crepo.createCinema(Cinema(2, "Pobeda", "Novosibirsk",
+            "Lenina 1", "Asia/Novosibirsk")))?.id
 
-        handleRequest(HttpMethod.Get, "/cinema/2").apply {
+        handleRequest(HttpMethod.Get, "/cinema/$id").apply {
             assertEquals(HttpStatusCode.OK, response.status())
             val expected = buildJsonObject {
-                put("id", 2)
+                put("id", id)
                 put("name", "Pobeda")
                 put("city", "Novosibirsk")
                 put("address", "Lenina 1")
@@ -71,7 +77,7 @@ class HallAppTest {
 
     @Test
     fun `get absent`() = testApp {
-        repo.map[2] = Cinema(3, "Pobeda", "Novosibirsk", "Lenina 1", "Asia/Novosibirsk")
+        crepo.map[2] = Cinema(3, "Pobeda", "Novosibirsk", "Lenina 1", "Asia/Novosibirsk")
 
         handleRequest(HttpMethod.Get, "/cinema/33").apply {
             assertEquals(HttpStatusCode.NotFound, response.status())
@@ -89,8 +95,8 @@ class HallAppTest {
 
     @Test
     fun `list all`() = testApp {
-        repo.map[4] = Cinema(4, "Pobeda", "Novosibirsk", "Lenina 1", "Asia/Novosibirsk")
-        repo.map[5] = Cinema(5, "Cosmos", "Moscow", "Petrovka 38", "Europe/Moscow")
+        crepo.map[4] = Cinema(4, "Pobeda", "Novosibirsk", "Lenina 1", "Asia/Novosibirsk")
+        crepo.map[5] = Cinema(5, "Cosmos", "Moscow", "Petrovka 38", "Europe/Moscow")
 
         handleRequest(HttpMethod.Get, "/cinema").apply {
             assertEquals(200, response.status()?.value)
@@ -116,7 +122,7 @@ class HallAppTest {
 
     @Test
     fun `delete one`() = testApp {
-        repo.map[6] = Cinema(6, "Pobeda", "Novosibirsk", "Lenina 1", "Asia/Novosibirsk")
+        crepo.map[6] = Cinema(6, "Pobeda", "Novosibirsk", "Lenina 1", "Asia/Novosibirsk")
 
         handleRequest(HttpMethod.Delete, "/cinema/6").apply {
             assertEquals(HttpStatusCode.OK, response.status())
@@ -133,7 +139,7 @@ class HallAppTest {
 
     @Test
     fun `delete absent`() = testApp {
-        repo.map[6] = Cinema(6, "Pobeda", "Novosibirsk", "Lenina 1", "Asia/Novosibirsk")
+        crepo.map[6] = Cinema(6, "Pobeda", "Novosibirsk", "Lenina 1", "Asia/Novosibirsk")
 
         handleRequest(HttpMethod.Delete, "/cinema/33").apply {
             assertEquals(HttpStatusCode.NotFound, response.status())
@@ -151,11 +157,15 @@ class HallAppTest {
 
     private fun testApp(callback: TestApplicationEngine.() -> Unit) {
         withTestApplication({
-            cinema(repo)
+            cinema(crepo)
+            hall(hrepo)
+            seat(srepo)
         }, callback)
     }
 
     companion object {
-        val repo = FileCinemaRepo()
+        val crepo = FileCinemaRepo()
+        val hrepo = FileHallRepo()
+        val srepo = DbSeatRepo(DbCinemaRepoTest.url)
     }
 }
