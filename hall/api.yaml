@@ -173,6 +173,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Hall'
+        400:
+          description: No cinema parameter
   /hall/{id}:
     get:
       tags:

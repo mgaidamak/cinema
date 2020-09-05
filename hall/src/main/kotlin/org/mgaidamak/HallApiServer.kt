@@ -71,7 +71,7 @@ class HallApiServer {
                 println("Get ${call.request.uri}")
                 val cinema = call.parameters["cinema"]?.toIntOrNull()
                 if (cinema == null) {
-                    call.respond(HttpStatusCode.BadRequest, "Invalid cinema")
+                    call.respond(HttpStatusCode.BadRequest, "No cinema parameter")
                     return@get
                 }
                 val page = Page(0, 10)
