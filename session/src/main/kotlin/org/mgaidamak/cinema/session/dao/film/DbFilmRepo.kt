@@ -36,12 +36,12 @@ class DbFilmRepo(url: String,
     private tailrec fun ResultSet.collect(list: List<Film>): List<Film>
         = if (!next()) list else collect(list.plus(Film(getInt(1), getString(2))))
 
-    override fun getFilms(page: Page, sort: List<String>, filter: String?): Collection<Film> {
+    override fun getFilms(page: Page, name: String?): Collection<Film> {
         val sql = "SELECT id, name FROM film WHERE name ILIKE '%' || ? || '%' LIMIT ? OFFSET ?"
         return try {
             DriverManager.getConnection(url, props).use { it ->
                 it.prepareStatement(sql).use { ps ->
-                    ps.setString(1, filter ?: "")
+                    ps.setString(1, name ?: "")
                     ps.setInt(2, page.limit)
                     ps.setInt(3, page.offset)
                     ps.executeQuery().use { it.collect(emptyList()) }

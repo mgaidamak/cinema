@@ -43,7 +43,7 @@ abstract class IFilmRepoTest(private val repo: IFilmRepo) {
         assertNotNull(repo.createFilm(film))
         val second = assertNotNull(repo.createFilm(film))
         val expected = listOf(second)
-        val found = repo.getFilms(page = Page(1, 2), filter = "chelovek")
+        val found = repo.getFilms(page = Page(1, 2), name = "chelovek")
         assertTrue { found.containsAll(expected) }
         assertEquals(expected.size, found.size)
     }
@@ -57,7 +57,7 @@ abstract class IFilmRepoTest(private val repo: IFilmRepo) {
         val film3 = Film(name = "Zhizn i sudba")
         val third = assertNotNull(repo.createFilm(film3))
         val expected = listOf(first, third)
-        val found = repo.getFilms(filter = "sudba")
+        val found = repo.getFilms(name = "sudba")
         assertTrue { found.containsAll(expected) }
         assertEquals(expected.size, found.size)
     }

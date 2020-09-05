@@ -28,6 +28,32 @@ services:
       - postgresql
     links:
       - postgresql
+  session:
+    image: cinema-session
+    environment:
+      - SESSIONSQL=jdbc:postgresql://postgresql:5432/session
+    ports:
+      # host:container
+      - "8082:8080"
+    networks:
+      - test_network
+    depends_on:
+      - postgresql
+    links:
+      - postgresql
+  ticket:
+    image: cinema-ticket
+    environment:
+      - TOCKETSQL=jdbc:postgresql://postgresql:5432/ticket
+    ports:
+      # host:container
+      - "8083:8080"
+    networks:
+      - test_network
+    depends_on:
+      - postgresql
+    links:
+      - postgresql
   public:
     image: cinema-public
     environment:

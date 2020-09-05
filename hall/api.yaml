@@ -12,8 +12,6 @@ servers:
 paths:
   /cinema:
     post:
-      tags:
-      - cinema
       summary: Create new cinema
       description: Create new cinema
       operationId: createCinema
@@ -30,8 +28,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Cinema'
     get:
-      tags:
-      - cinema
       summary: Get all cinemas
       description: Get all cinemas
       operationId: getCinemas
@@ -66,8 +62,6 @@ paths:
                   $ref: '#/components/schemas/Cinema'
   /cinema/{id}:
     get:
-      tags:
-      - cinema
       summary: Get cinema by ID
       description: Get cinema by ID
       operationId: getCinemaById
@@ -91,8 +85,6 @@ paths:
         404:
           description: Cinema not found
     delete:
-      tags:
-        - cinema
       summary: Delete cinema by ID
       description: Delete cinema by ID
       operationId: deleteCinemaById
@@ -110,9 +102,7 @@ paths:
           content:
             'application/json':
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Cinema'
+                $ref: '#/components/schemas/Cinema'
         400:
           description: Invalid id (not Long)
         404:
@@ -120,8 +110,6 @@ paths:
 
   /hall:
     post:
-      tags:
-        - cinema
       summary: Create new hall
       description: Create new hall
       operationId: createHall
@@ -138,8 +126,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Hall'
     get:
-      tags:
-        - cinema
       summary: Get all halls
       description: Get all halls
       operationId: getHalls
@@ -177,8 +163,6 @@ paths:
           description: No cinema parameter
   /hall/{id}:
     get:
-      tags:
-        - cinema
       summary: Get hall by ID
       description: Get hall by ID
       operationId: getHallById
@@ -202,8 +186,6 @@ paths:
         404:
           description: Hall not found
     delete:
-      tags:
-        - cinema
       summary: Delete hall by ID
       description: Delete hall by ID
       operationId: deleteHallById
@@ -231,8 +213,6 @@ paths:
 
   /seat:
     post:
-      tags:
-        - cinema
       summary: Create new seat
       description: Create new seat
       operationId: createSeat
@@ -264,8 +244,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Seat'
     get:
-      tags:
-        - cinema
       summary: Get all seats
       description: Get all seats
       operationId: getSeats
@@ -308,8 +286,6 @@ paths:
                   $ref: '#/components/schemas/Hall'
   /seat/{id}:
     get:
-      tags:
-        - cinema
       summary: Get seat by ID
       description: Get seat by ID
       operationId: getSeatById
@@ -333,8 +309,6 @@ paths:
         404:
           description: Seat not found
     delete:
-      tags:
-        - cinema
       summary: Delete seat by ID
       description: Delete seat by ID
       operationId: deleteSeatById

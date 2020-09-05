@@ -43,15 +43,16 @@ class DbSessionRepo(url: String,
         getInt(5))))
 
     override fun getSessions(film: Int,
-                             page: Page,
-                             sort: List<String>): Collection<Session> {
-        val sql = "SELECT id, film, hall, date, price FROM session WHERE film=? LIMIT ? OFFSET ?"
+                             hall: Array<Int>,
+                             page: Page): Collection<Session> {
+        val sql = "SELECT id, film, hall, date, price FROM session WHERE film=? AND hall = ANY(?) LIMIT ? OFFSET ?"
         return try {
             DriverManager.getConnection(url, props).use { connection ->
                 connection.prepareStatement(sql).use { ps ->
                     ps.setInt(1, film)
-                    ps.setInt(2, page.limit)
-                    ps.setInt(3, page.offset)
+                    ps.setArray(2, connection.createArrayOf("integer", hall))
+                    ps.setInt(3, page.limit)
+                    ps.setInt(4, page.offset)
                     ps.executeQuery().use { it.collect(emptyList()) }
                 }
             }

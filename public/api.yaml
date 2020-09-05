@@ -195,6 +195,18 @@ components:
           type: string
         address:
           type: string
+        halls:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hall'
+    Hall:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
     Session:
       type: object
       properties:
@@ -202,8 +214,7 @@ components:
           type: integer
           format: int32
         film:
-          type: integer
-          format: int32
+          type: string
         hall:
           type: integer
           format: int32

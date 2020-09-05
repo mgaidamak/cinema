@@ -9,8 +9,7 @@ import org.mgaidamak.cinema.session.dao.Page
 interface IFilmRepo {
     fun createFilm(film: Film): Film?
     fun getFilms(page: Page = Page(0, 10),
-                 sort: List<String> = emptyList(),
-                 filter: String? = null): Collection<Film>
+                 name: String? = null): Collection<Film>
     fun getFilmById(id: Int): Film?
     fun deleteFilmById(id: Int): Film?
     fun clear()

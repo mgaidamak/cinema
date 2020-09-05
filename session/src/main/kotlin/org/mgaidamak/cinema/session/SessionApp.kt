@@ -47,11 +47,8 @@ fun Application.film(repo: IFilmRepo) {
         }
     }
     routing {
-        get("/") {
-            call.respondText("My Hall App", ContentType.Text.Html)
-        }
-        SessionApiServer(repo).apply {
-            registerFilm()
+        SessionApiServer().apply {
+            registerFilm(repo)
         }
     }
 }

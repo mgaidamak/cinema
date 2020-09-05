@@ -43,8 +43,10 @@ abstract class ISessionRepoTest(private val repo: ISessionRepo,
             date = ZonedDateTime.now(ZoneId.systemDefault()), price = 100)))
         val second = assertNotNull(repo.createSession(Session(film = filmId, hall = 88,
             date = ZonedDateTime.now(ZoneId.systemDefault()), price = 100)))
+        assertNotNull(repo.createSession(Session(film = filmId, hall = 9,
+            date = ZonedDateTime.now(ZoneId.systemDefault()), price = 100)))
         val expected = listOf(first, second)
-        val found = repo.getSessions(filmId)
+        val found = repo.getSessions(filmId, arrayOf(7, 88))
         assertTrue { found.containsAll(expected) }
         assertEquals(expected.size, found.size)
     }
@@ -56,8 +58,10 @@ abstract class ISessionRepoTest(private val repo: ISessionRepo,
             date = ZonedDateTime.now(ZoneId.systemDefault()), price = 100)))
         val second = assertNotNull(repo.createSession(Session(film = filmId, hall = 88,
             date = ZonedDateTime.now(ZoneId.systemDefault()), price = 100)))
+        assertNotNull(repo.createSession(Session(film = filmId, hall = 88,
+            date = ZonedDateTime.now(ZoneId.systemDefault()), price = 100)))
         val expected = listOf(second)
-        val found = repo.getSessions(filmId, page = Page(1, 2))
+        val found = repo.getSessions(filmId, arrayOf(88), Page(0, 1))
         assertTrue { found.containsAll(expected) }
         assertEquals(expected.size, found.size)
     }

@@ -14,7 +14,7 @@ class SessionAppTest {
     fun `test root`() = testApp {
         handleRequest(HttpMethod.Get, "/").apply {
             assertEquals(200, response.status()?.value)
-            assertEquals("My Hall App", response.content)
+            assertEquals("My Session App", response.content)
         }
     }
 

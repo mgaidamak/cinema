@@ -9,8 +9,8 @@ import org.mgaidamak.cinema.session.dao.Session
 interface ISessionRepo {
     fun createSession(session: Session): Session?
     fun getSessions(film: Int,
-                    page: Page = Page(0, 10),
-                    sort: List<String> = emptyList()): Collection<Session>
+                    hall: Array<Int>,
+                    page: Page = Page(0, 10)): Collection<Session>
     fun getSessionById(id: Int): Session?
     fun deleteSessionById(id: Int): Session?
     fun clear()

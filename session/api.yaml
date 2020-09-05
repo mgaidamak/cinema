@@ -1,0 +1,248 @@
+openapi: 3.0.0
+info:
+  title: Session API
+  description: Session API for Administrator
+  version: 1.0.0
+  contact:
+    name: Mikhail Gaidamaka
+    url: https://github.com/mgaidamak
+    email: magnoly.nsk@gmail.com
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /film:
+    post:
+      summary: Create new film
+      description: Create new film
+      operationId: createFilm
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Film'
+      responses:
+        200:
+          description: Film has been created
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Film'
+    get:
+      summary: Get all films
+      description: Get all films
+      operationId: getFilms
+      parameters:
+      - name: name
+        in: query
+        description: Search by substring
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Offset-based strategy pagination
+        schema:
+          $ref: '#/components/schemas/Page'
+      responses:
+        200:
+          description: List of films
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Film'
+  /film/{id}:
+    get:
+      summary: Get film by ID
+      description: Get film by ID
+      operationId: getFilmById
+      parameters:
+      - name: id
+        in: path
+        description: ID of film
+        required: true
+        schema: 
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: Film associated with ID
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Film'
+        400:
+          description: Invalid id (not int32)
+        404:
+          description: Film not found
+    delete:
+      summary: Delete film by ID
+      description: Delete film by ID
+      operationId: deleteCinemaById
+      parameters:
+        - name: id
+          in: path
+          description: ID of film
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: Previous film associated with ID
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Film'
+        400:
+          description: Invalid id (not int32)
+        404:
+          description: Cinema not found
+
+  /session:
+    post:
+      summary: Create new session
+      description: Create new session
+      operationId: createSession
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Session'
+      responses:
+        200:
+          description: Session has been created
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Session'
+    get:
+      summary: Get all sessions
+      description: Get all sessions
+      operationId: getSessions
+      parameters:
+        - name: film
+          in: query
+          description: Search film
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: hall
+          in: query
+          description: Search hall
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int32
+        - name: page
+          in: query
+          description: Offset-based strategy pagination
+          schema:
+            $ref: '#/components/schemas/Page'
+      responses:
+        200:
+          description: List of sessions
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+        400:
+          description: No cinema parameter
+  /session/{id}:
+    get:
+      summary: Get session by ID
+      description: Get session by ID
+      operationId: getSessionById
+      parameters:
+        - name: id
+          in: path
+          description: ID of session
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: Hall associated with ID
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Session'
+        400:
+          description: Invalid id (not int32)
+        404:
+          description: Hall not found
+    delete:
+      summary: Delete session by ID
+      description: Delete session by ID
+      operationId: deleteSessionById
+      parameters:
+        - name: id
+          in: path
+          description: ID of session
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: Previous session associated with ID
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+        400:
+          description: Invalid id (not int32)
+        404:
+          description: Hall not found
+
+components:
+  schemas:
+    Film:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+      required:
+      - name
+    Session:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        film:
+          type: integer
+          format: int32
+        hall:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date-time
+        price:
+          type: integer
+          format: int32
+      required:
+      - film
+      - hall
+      - date
+      - price
+    Page:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
