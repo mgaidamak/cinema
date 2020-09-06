@@ -51,7 +51,7 @@ data class Session(
     val id: Int = 0,
     val film: String,
     val hall: Int,
-    val date: ZonedDateTime,
+    val date: String,
     val price: Int
 ) {
     constructor(adminSession: AdminSession, film: String): this(
@@ -66,7 +66,7 @@ data class AdminSession(
     val id: Int = 0,
     val film: Int,
     val hall: Int,
-    val date: ZonedDateTime,
+    val date: String,
     val price: Int
 )
 
