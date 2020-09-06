@@ -1,7 +1,13 @@
 package org.mgaidamak.cinema.public.dao
 
 import io.ktor.client.HttpClient
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.patch
+import io.ktor.client.request.post
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import java.time.LocalDate
 
 /**
@@ -80,15 +86,81 @@ abstract class IPublicRepo {
         return seatList.map { Seat(it, soldMap.getOrDefault(it.id, 0)) }
     }
 
-    suspend fun getBill(id: Int): Bill? {
-        TODO("Not yet implemented")
-    }
-
+    /**
+     * User try to create bill and buy tickets
+     */
     suspend fun postBill(bill: Bill): Bill? {
-        TODO("Not yet implemented")
+        // Post new bill
+        val billPath = "/bill"
+        println("Try $billPath")
+        val billBody = AdminBill(customer = bill.customer, session = bill.session,
+        status = 0, total = bill.total)
+        val newBill = ticketClient.post<AdminBill>(path = billPath, body = billBody) {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        }
+        // Post tickets
+        val ticketPath = "/ticket"
+        println("Try $ticketPath")
+        for (seat in bill.seats) {
+            val ticketBody = AdminTicket(bill = newBill.id, session = bill.session,
+            seat = seat.id, status = 2)
+            ticketClient.post<AdminTicket>(path = ticketPath, body = ticketBody) {
+                header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            }
+        }
+        // Confirm bill status
+        val patchPath = "/bill/${newBill.id}"
+        println("Try $patchPath")
+        val patchBody = newBill.copy(status = 1)
+        val patchBill = ticketClient.patch<AdminBill>(path = patchPath, body = patchBody) {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        }
+        return Bill(patchBill, bill.seats)
     }
 
+    /**
+     * User looking for bill status some time later
+     */
+    suspend fun getBill(id: Int): Bill? {
+        // Show bill status
+        val billPath = "/bill/$id"
+        println("Try $billPath")
+        val adminBill = ticketClient.get<AdminBill>(path = billPath)
+        // Show payed tickets
+        val ticketPath = "/ticket?bill=$id"
+        println("Try $ticketPath")
+        val adminTickets = ticketClient.get<List<AdminTicket>>(path = ticketPath)
+        val seats = ArrayList<Seat>()
+        for (adminTicket in adminTickets) {
+            // Get seat information
+            val seatPath = "/seat/${adminTicket.seat}"
+            println("Try $seatPath")
+            val adminSeat = hallClient.get<AdminSeat>(path = seatPath)
+            seats.add(Seat(adminSeat, adminTicket.status))
+        }
+        return Bill(adminBill, seats)
+    }
+
+    /**
+     * User wants to return money for tickets
+     */
     suspend fun deleteBill(id: Int): Bill? {
-        TODO("Not yet implemented")
+        // Show bill status
+        val billPath = "/bill/$id"
+        println("Try $billPath")
+        val adminBill = ticketClient.get<AdminBill>(path = billPath)
+        // Delete payed tickets
+        val ticketPath = "/ticket?bill=$id"
+        println("Try $ticketPath")
+        val adminTickets = ticketClient.delete<List<AdminTicket>>(path = ticketPath)
+        val seats = adminTickets.map { Seat(it.seat, 0, 0, 0) }
+        // Patch bill status
+        val patchPath = "/bill/$id"
+        println("Try $patchPath")
+        val patchBody = adminBill.copy(status = 3)
+        val patchBill = ticketClient.patch<AdminBill>(path = patchPath, body = patchBody) {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        }
+        return Bill(patchBill, seats)
     }
 }

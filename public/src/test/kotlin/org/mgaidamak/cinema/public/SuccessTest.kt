@@ -1,9 +1,12 @@
 package org.mgaidamak.cinema.public
 
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
@@ -151,38 +154,41 @@ private class SuccessRepo: MockPublicRepo() {
         }
     }
 
-    override fun hallPost(url: String): Pair<String, HttpStatusCode> {
-        return when (url) {
-            else -> "" to HttpStatusCode.NotFound
-        }
-    }
-
-    override fun sessionPost(url: String): Pair<String, HttpStatusCode> {
-        return when (url) {
-            else -> "" to HttpStatusCode.NotFound
-        }
-    }
-
     override fun ticketPost(url: String): Pair<String, HttpStatusCode> {
         return when (url) {
+            "/bill" -> {
+                buildJsonObject {
+                    put("id", 10)
+                    put("customer", 7)
+                    put("session", 2)
+                    put("status", 0)
+                    put("total", 200)
+                }.toString() to HttpStatusCode.OK
+            }
+            "/ticket" -> {
+                buildJsonObject {
+                    put("id", 11)
+                    put("bill", 10)
+                    put("session", 2)
+                    put("seat", 102)
+                    put("status", 2)
+                }.toString() to HttpStatusCode.OK
+            }
             else -> "" to HttpStatusCode.NotFound
         }
     }
 
-    override fun hallDelete(url: String): Pair<String, HttpStatusCode> {
+    override fun ticketPatch(url: String): Pair<String, HttpStatusCode> {
         return when (url) {
-            else -> "" to HttpStatusCode.NotFound
-        }
-    }
-
-    override fun sessionDelete(url: String): Pair<String, HttpStatusCode> {
-        return when (url) {
-            else -> "" to HttpStatusCode.NotFound
-        }
-    }
-
-    override fun ticketDelete(url: String): Pair<String, HttpStatusCode> {
-        return when (url) {
+            "/bill/10" -> {
+                buildJsonObject {
+                    put("id", 10)
+                    put("customer", 7)
+                    put("session", 2)
+                    put("status", 2)
+                    put("total", 200)
+                }.toString() to HttpStatusCode.OK
+            }
             else -> "" to HttpStatusCode.NotFound
         }
     }
@@ -273,6 +279,45 @@ class SuccessTest {
                     put("x", 2)
                     put("y", 2)
                     put("status", 0)
+                })
+            }.toString()
+            assertEquals(expected, response.content)
+        }
+    }
+
+    // TODO fix test
+    fun `post bill`() = testApp {
+        handleRequest(HttpMethod.Post, "/public/bill") {
+            addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            setBody(buildJsonObject {
+                put("customer", 7)
+                put("session", 2)
+                put("status", 0)
+                put("total", 400)
+                put("seats", buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 102)
+                        put("x", 2)
+                        put("y", 1)
+                        put("status", 0)
+                    })
+                })
+            }.toString())
+        }.apply {
+            assertEquals(200, response.status()?.value)
+            val expected = buildJsonObject {
+                put("id", 10)
+                put("customer", 7)
+                put("session", 2)
+                put("status", 1)
+                put("total", 200)
+                put("seats", buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 102)
+                        put("x", 2)
+                        put("y", 1)
+                        put("status", 2)
+                    })
                 })
             }.toString()
             assertEquals(expected, response.content)

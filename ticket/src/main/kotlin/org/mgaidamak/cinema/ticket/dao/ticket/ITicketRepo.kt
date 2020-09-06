@@ -7,7 +7,7 @@ import org.mgaidamak.cinema.ticket.dao.Ticket
  */
 interface ITicketRepo {
     fun createTicket(ticket: Ticket): Ticket?
-    fun getTickets(session: Int): Collection<Ticket>
+    fun getTickets(session: Int?, bill: Int?): Collection<Ticket>
     fun getTicket(session: Int, seat: Int): Ticket?
     fun deleteTicketById(id: Int): Ticket?
     fun deleteTicketByBill(bill: Int): Collection<Ticket>

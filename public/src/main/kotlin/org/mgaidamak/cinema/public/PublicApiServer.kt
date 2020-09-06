@@ -42,7 +42,16 @@ class PublicApiServer(val repo: IPublicRepo) {
                 }
                 repo.getSeats(session).also { call.respond(it) }
             }
-            route("/order/{id?}") {
+            route("/bill") {
+                post {
+                    println("Post ${call.request.uri}")
+                    val body: Bill = call.receive()
+                    println("Body $body")
+                    repo.postBill(body)?.also { call.respond(it) }
+                        ?: call.respond(HttpStatusCode.NotFound, "Not created")
+                }
+            }
+            route("/bill/{id}") {
                 get {
                     println("Get ${call.request.uri}")
                     println("Params ${call.parameters}")
@@ -53,13 +62,6 @@ class PublicApiServer(val repo: IPublicRepo) {
                     }
                     repo.getBill(id)?.also { call.respond(it) }
                         ?: call.respond(HttpStatusCode.NotFound, "Not found by $id")
-                }
-                post {
-                    println("Post ${call.request.uri}")
-                    val body: Bill = call.receive()
-                    println("Body $body")
-                    repo.postBill(body)?.also { call.respond(it) }
-                        ?: call.respond(HttpStatusCode.NotFound, "Not created")
                 }
                 delete {
                     println("Delete ${call.request.uri}")

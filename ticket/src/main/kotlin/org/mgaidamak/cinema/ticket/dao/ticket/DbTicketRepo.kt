@@ -4,8 +4,11 @@ import org.mgaidamak.cinema.ticket.dao.DbRepo
 import org.mgaidamak.cinema.ticket.dao.Ticket
 
 import java.sql.DriverManager
+import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.util.Properties
+
+typealias PSetter = (PreparedStatement) -> Unit
 
 /**
  * Production ready repository on PostgreSQL
@@ -36,12 +39,26 @@ class DbTicketRepo(url: String,
         }
     }
 
-    override fun getTickets(session: Int): Collection<Ticket> {
-        val sql = "SELECT id, bill, session, seat, status FROM seat WHERE session = ?"
+    override fun getTickets(session: Int?, bill: Int?): Collection<Ticket> {
+        val where = ArrayList<String>()
+        val args = ArrayList<PSetter>()
+        var index = 1
+        if (session != null) {
+            where.add("session = ?")
+            args.add { rs -> rs.setInt(index++, session) }
+        }
+        if (bill != null) {
+            where.add("bill = ?")
+            args.add { rs -> rs.setInt(index++, bill) }
+        }
+        val sql = "SELECT id, bill, session, seat, status FROM seat "
+            .plus(where.joinToString(prefix = "WHERE ", separator = " AND "))
         return try {
             DriverManager.getConnection(url, props).use { connection ->
                 connection.prepareStatement(sql).use { ps ->
-                    ps.setInt(1, session)
+                    for (arg in args) {
+                        arg(ps)
+                    }
                     ps.executeQuery().use { it.collect(emptyList()) }
                 }
             }

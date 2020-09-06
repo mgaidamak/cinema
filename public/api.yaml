@@ -98,31 +98,31 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Seat'
-  /public/order/:
+  /public/bill/:
     post:
       tags:
       - public
-      summary: Create new order
-      description: Create new order
-      operationId: orderTicket
+      summary: Create new bill
+      description: Create new bill
+      operationId: buyTicket
       requestBody:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/Order'
+              $ref: '#/components/schemas/Bill'
       responses:
         200:
           description: Cinema has been created
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Order'
-  /public/order/{id}:
+                $ref: '#/components/schemas/Bill'
+  /public/bill/{id}:
     get:
       tags:
         - public
-      summary: Get order by ID
-      description: Get order by ID
+      summary: Get bill by ID
+      description: Get bill by ID
       operationId: getOrderById
       parameters:
         - name: id
@@ -134,13 +134,13 @@ paths:
             format: int32
       responses:
         200:
-          description: Previous order associated with ID
+          description: Previous bill associated with ID
           content:
             'application/json':
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Order'
+                  $ref: '#/components/schemas/Bill'
         400:
           description: Invalid id (not Long)
         404:
@@ -148,8 +148,8 @@ paths:
     delete:
       tags:
         - public
-      summary: Delete order by ID
-      description: Delete order by ID
+      summary: Delete bill by ID
+      description: Delete bill by ID
       operationId: deleteOrderById
       parameters:
         - name: id
@@ -161,13 +161,13 @@ paths:
             format: int32
       responses:
         200:
-          description: Previous order associated with ID
+          description: Previous bill associated with ID
           content:
             'application/json':
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Order'
+                  $ref: '#/components/schemas/Bill'
         400:
           description: Invalid id (not Long)
         404:
@@ -232,7 +232,7 @@ components:
           description: 0 free, 1 reserved, 2 sold
           type: integer
           format: int32
-    Order:
+    Bill:
       type: object
       properties:
         id:
@@ -245,6 +245,7 @@ components:
           type: integer
           format: int32
         status:
+          description: 0 new, 1 payed, 2 rejected, 3 deleted
           type: integer
           format: int32
         seats:

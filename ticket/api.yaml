@@ -77,9 +77,37 @@ paths:
           description: Invalid id (not int32)
         404:
           description: Bill not found
+    patch:
+      summary: Update bill by ID
+      description: Update bill by ID
+      operationId: patchBillById
+      parameters:
+        - name: id
+          in: path
+          description: ID of bill
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Bill'
+      responses:
+        200:
+          description: Bill associated with ID
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Bill'
+        400:
+          description: Invalid id (not int32)
+        404:
+          description: Bill not found
     delete:
       summary: Delete bill by ID
-      description: Delete film by ID
+      description: Delete bill by ID
       operationId: deleteBillById
       parameters:
         - name: id
@@ -120,13 +148,20 @@ paths:
                 $ref: '#/components/schemas/Ticket'
     get:
       summary: Get all tickets
-      description: Get all sessticketsions
+      description: Get all tickets
       operationId: getTickets
       parameters:
         - name: session
           in: query
           description: Search by session
-          required: true
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: bill
+          in: query
+          description: Search by bill
+          required: false
           schema:
             type: integer
             format: int32
@@ -146,6 +181,34 @@ paths:
                   $ref: '#/components/schemas/Ticket'
         400:
           description: No session parameter
+    delete:
+      summary: Delete ticket by bill
+      description: Delete ticket by bill
+      operationId: deleteTicketByBill
+      parameters:
+        - name: bill
+          in: query
+          description: Search by bill
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: page
+          in: query
+          description: Offset-based strategy pagination
+          schema:
+            $ref: '#/components/schemas/Ticket'
+      responses:
+        200:
+          description: Previous tickets associated with ID
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ticket'
+        400:
+          description: No bill parameter
   /ticket/{id}:
     get:
       summary: Get ticket by ID

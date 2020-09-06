@@ -38,7 +38,22 @@ class DbBillRepo(url: String,
     }
 
     override fun updateBill(bill: Bill): Bill? {
-        TODO("Not yet implemented")
+        val sql = """UPDATE bill SET status = ? WHERE id = ?
+                     RETURNING id, customer, session, status, total"""
+        return try {
+            DriverManager.getConnection(url, props).use { connection ->
+                connection.prepareStatement(sql).use { ps ->
+                    ps.setInt(1, bill.status)
+                    ps.setInt(2, bill.id)
+                    ps.executeQuery().use { rs ->
+                        if (rs.next()) Bill(rs) else null
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
     }
 
     override fun getBills(page: Page, sort: List<String>): Collection<Bill> {
