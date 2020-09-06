@@ -12,6 +12,7 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.util.KtorExperimentalAPI
+import io.ktor.utils.io.printStack
 import org.mgaidamak.cinema.public.dao.IPublicRepo
 import org.mgaidamak.cinema.public.dao.RestPublicRepo
 
@@ -36,6 +37,7 @@ fun Application.public(repo: IPublicRepo) {
     // TODO install(CallLogging)
     install(StatusPages) {
         exception<Throwable> { cause ->
+            cause.printStack()
             call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
         }
     }
