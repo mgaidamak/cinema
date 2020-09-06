@@ -114,12 +114,39 @@ private class SuccessRepo: MockPublicRepo() {
                     put("name", "Great race")
                 }.toString() to HttpStatusCode.OK
             }
+            "/session/2" -> {
+                buildJsonObject {
+                    put("id", 2)
+                    put("film", 2)
+                    put("hall", 11)
+                    put("date", "2020-09-10T03:00:00Z")
+                    put("price", 200)
+                }.toString() to HttpStatusCode.OK
+            }
             else -> "" to HttpStatusCode.NotFound
         }
     }
 
     override fun ticketGet(url: String): Pair<String, HttpStatusCode> {
         return when (url) {
+            "/ticket?session=2" -> {
+                buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 1)
+                        put("bill", 4)
+                        put("session", 2)
+                        put("seat", 100)
+                        put("status", 2)
+                    })
+                    add(buildJsonObject {
+                        put("id", 2)
+                        put("bill", 4)
+                        put("session", 2)
+                        put("seat", 101)
+                        put("status", 2)
+                    })
+                }.toString() to HttpStatusCode.OK
+            }
             else -> "" to HttpStatusCode.NotFound
         }
     }
@@ -163,6 +190,9 @@ private class SuccessRepo: MockPublicRepo() {
 
 class SuccessTest {
 
+    /**
+     * User looking for cinema at selected city
+     */
     @Test
     fun `get cinema list`() = testApp {
         handleRequest(HttpMethod.Get, "/public/cinema?city=Novosibirsk").apply {
@@ -185,6 +215,9 @@ class SuccessTest {
         }
     }
 
+    /**
+     * User looking for session at selected cinema
+     */
     @Test
     fun `get session list`() = testApp {
         handleRequest(HttpMethod.Get, "/public/session?cinema=2").apply {
@@ -203,6 +236,43 @@ class SuccessTest {
                     put("hall", 11)
                     put("date", "2020-09-10T03:00:00Z")
                     put("price", 200)
+                })
+            }.toString()
+            assertEquals(expected, response.content)
+        }
+    }
+
+    /**
+     * User looking for free seats (that has 0 status)
+     */
+    @Test
+    fun `get seats`() = testApp {
+        handleRequest(HttpMethod.Get, "/public/seat?session=2").apply {
+            assertEquals(200, response.status()?.value)
+            val expected = buildJsonArray {
+                add(buildJsonObject {
+                    put("id", 100)
+                    put("x", 1)
+                    put("y", 1)
+                    put("status", 2)
+                })
+                add(buildJsonObject {
+                    put("id", 101)
+                    put("x", 1)
+                    put("y", 2)
+                    put("status", 2)
+                })
+                add(buildJsonObject {
+                    put("id", 102)
+                    put("x", 2)
+                    put("y", 1)
+                    put("status", 0)
+                })
+                add(buildJsonObject {
+                    put("id", 103)
+                    put("x", 2)
+                    put("y", 2)
+                    put("status", 0)
                 })
             }.toString()
             assertEquals(expected, response.content)

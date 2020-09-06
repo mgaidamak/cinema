@@ -74,8 +74,8 @@ abstract class IPublicRepo {
         // Get sold tickets
         val ticketPath = "/ticket?session=${adminSession.id}"
         println("Try $ticketPath")
-        val ticketList = hallClient.get<List<AdminTicket>>(path = ticketPath)
-        val soldMap = ticketList.map { it.id to it.status }.toMap()
+        val ticketList = ticketClient.get<List<AdminTicket>>(path = ticketPath)
+        val soldMap = ticketList.map { it.seat to it.status }.toMap()
         // Collect to hall map with status
         return seatList.map { Seat(it, soldMap.getOrDefault(it.id, 0)) }
     }
