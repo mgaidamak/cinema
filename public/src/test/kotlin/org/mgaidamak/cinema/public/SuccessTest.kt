@@ -81,6 +81,38 @@ private class SuccessRepo: MockPublicRepo() {
             else -> "" to HttpStatusCode.NotFound
         }
     }
+
+    override fun sessionGet(url: String): Pair<String, HttpStatusCode> {
+        TODO("Not yet implemented")
+    }
+
+    override fun ticketGet(url: String): Pair<String, HttpStatusCode> {
+        TODO("Not yet implemented")
+    }
+
+    override fun hallPost(url: String): Pair<String, HttpStatusCode> {
+        TODO("Not yet implemented")
+    }
+
+    override fun sessionPost(url: String): Pair<String, HttpStatusCode> {
+        TODO("Not yet implemented")
+    }
+
+    override fun ticketPost(url: String): Pair<String, HttpStatusCode> {
+        TODO("Not yet implemented")
+    }
+
+    override fun hallDelete(url: String): Pair<String, HttpStatusCode> {
+        TODO("Not yet implemented")
+    }
+
+    override fun sessionDelete(url: String): Pair<String, HttpStatusCode> {
+        TODO("Not yet implemented")
+    }
+
+    override fun ticketDelete(url: String): Pair<String, HttpStatusCode> {
+        TODO("Not yet implemented")
+    }
 }
 
 class SuccessTest {

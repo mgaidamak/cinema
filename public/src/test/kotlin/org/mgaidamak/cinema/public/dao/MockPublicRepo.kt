@@ -12,10 +12,9 @@ import io.ktor.http.headersOf
 
 abstract class MockPublicRepo: IPublicRepo() {
 
-    abstract fun hallGet(url: String): Pair<String, HttpStatusCode>
-
-    override val hallClient: HttpClient
-        get() = HttpClient(MockEngine) {
+    private fun mockClient(getter: (String) -> Pair<String, HttpStatusCode>,
+                           poster: (String) -> Pair<String, HttpStatusCode>,
+                           deleter: (String) -> Pair<String, HttpStatusCode>) = HttpClient(MockEngine) {
             install(JsonFeature) {
                 serializer = GsonSerializer()
             }
@@ -23,7 +22,17 @@ abstract class MockPublicRepo: IPublicRepo() {
                 addHandler { request ->
                     when (request.method) {
                         HttpMethod.Get -> {
-                            val pair = hallGet(request.url.encodedPath)
+                            val pair = getter(request.url.encodedPath)
+                            val responseHeaders = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
+                            respond(pair.first, pair.second, responseHeaders)
+                        }
+                        HttpMethod.Post -> {
+                            val pair = poster(request.url.encodedPath)
+                            val responseHeaders = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
+                            respond(pair.first, pair.second, responseHeaders)
+                        }
+                        HttpMethod.Delete -> {
+                            val pair = deleter(request.url.encodedPath)
                             val responseHeaders = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
                             respond(pair.first, pair.second, responseHeaders)
                         }
@@ -33,25 +42,24 @@ abstract class MockPublicRepo: IPublicRepo() {
             }
         }
 
+    abstract fun hallGet(url: String): Pair<String, HttpStatusCode>
+    abstract fun sessionGet(url: String): Pair<String, HttpStatusCode>
+    abstract fun ticketGet(url: String): Pair<String, HttpStatusCode>
+
+    abstract fun hallPost(url: String): Pair<String, HttpStatusCode>
+    abstract fun sessionPost(url: String): Pair<String, HttpStatusCode>
+    abstract fun ticketPost(url: String): Pair<String, HttpStatusCode>
+
+    abstract fun hallDelete(url: String): Pair<String, HttpStatusCode>
+    abstract fun sessionDelete(url: String): Pair<String, HttpStatusCode>
+    abstract fun ticketDelete(url: String): Pair<String, HttpStatusCode>
+
+    override val hallClient: HttpClient
+        get() = mockClient(this::hallGet, this::hallPost, this::hallDelete)
+
     override val sessionClient: HttpClient
-        get() = HttpClient(MockEngine) {
-            engine {
-                addHandler { request ->
-                    when (request.url.encodedPath) {
-                        else -> error("Unhandled ${request.url.encodedPath}")
-                    }
-                }
-            }
-        }
+        get() = mockClient(this::sessionGet, this::sessionPost, this::sessionDelete)
 
     override val ticketClient: HttpClient
-        get() = HttpClient(MockEngine) {
-            engine {
-                addHandler { request ->
-                    when (request.url.encodedPath) {
-                        else -> error("Unhandled ${request.url.encodedPath}")
-                    }
-                }
-            }
-        }
+        get() = mockClient(this::ticketGet, this::ticketPost, this::ticketDelete)
 }
