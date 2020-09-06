@@ -5,7 +5,7 @@ import java.sql.ResultSet
 import java.util.Properties
 
 abstract class DbRepo<T>(val url: String,
-                      val props: Properties = Properties()) {
+                         val props: Properties = Properties()) {
 
     protected abstract fun form(rs: ResultSet): T
 

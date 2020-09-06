@@ -12,18 +12,18 @@ import java.util.Properties
  * Production ready repository on PostgreSQL
  */
 class DbFilmRepo(url: String,
-                 props: Properties = Properties()): DbRepo(url, props), IFilmRepo {
+                 props: Properties = Properties()): DbRepo<Film>(url, props), IFilmRepo {
+
+    override fun form(rs: ResultSet) = Film(rs)
 
     override fun createFilm(film: Film): Film? {
-        val sql = "INSERT INTO film (name) VALUES (?) RETURNING id"
+        val sql = "INSERT INTO film (name) VALUES (?) RETURNING id, name"
         return try {
             DriverManager.getConnection(url, props).use { connection ->
                 connection.prepareStatement(sql).use { ps ->
                     ps.setString(1, film.name)
                     ps.executeQuery().use { rs ->
-                        if (rs.next()) rs.getInt(1) else null
-                    }?.let {
-                        Film(it, film.name)
+                        if (rs.next()) form(rs) else null
                     }
                 }
             }
@@ -32,9 +32,6 @@ class DbFilmRepo(url: String,
             null
         }
     }
-
-    private tailrec fun ResultSet.collect(list: List<Film>): List<Film>
-        = if (!next()) list else collect(list.plus(Film(getInt(1), getString(2))))
 
     override fun getFilms(page: Page, name: String?): Collection<Film> {
         val sql = "SELECT id, name FROM film WHERE name ILIKE '%' || ? || '%' LIMIT ? OFFSET ?"
@@ -53,30 +50,14 @@ class DbFilmRepo(url: String,
         }
     }
 
-    private fun queryFilm(id: Int, sql: String): Film? {
-        return try {
-            DriverManager.getConnection(url, props).use { connection ->
-                connection.prepareStatement(sql).use { ps ->
-                    ps.setInt(1, id)
-                    ps.executeQuery().use { rs ->
-                        if (rs.next()) Film(id, rs.getString(1)) else null
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-
     override fun getFilmById(id: Int): Film? {
-        val sql = "SELECT name FROM film WHERE id = ?"
-        return queryFilm(id, sql)
+        val sql = "SELECT id, name FROM film WHERE id = ?"
+        return single(id, sql)
     }
 
     override fun deleteFilmById(id: Int): Film? {
-        val sql = "DELETE FROM film WHERE id = ? RETURNING name"
-        return queryFilm(id, sql)
+        val sql = "DELETE FROM film WHERE id = ? RETURNING id, name"
+        return single(id, sql)
     }
 
     override fun clear() = clear("DELETE FROM film")

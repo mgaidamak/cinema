@@ -9,14 +9,16 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.mgaidamak.cinema.session.dao.Film
+import org.mgaidamak.cinema.session.dao.Session
 import org.mgaidamak.cinema.session.dao.film.DbFilmRepo
 import org.mgaidamak.cinema.session.dao.film.DbFilmRepoTest
 import org.mgaidamak.cinema.session.dao.session.DbSessionRepo
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNotSame
 
 class SessionAppTest {
     @Test
@@ -32,9 +34,16 @@ class SessionAppTest {
         frepo.clear()
     }
 
-    private fun createFilm(name: String): Int {
+    private fun insertFilm(name: String): Int {
         val film = Film(name = name)
         return assertNotNull(frepo.createFilm(film)).id
+    }
+
+    private fun insertSession(film: Int, hall: Int): Int {
+        val session = Session(film = film, hall = hall,
+        date = "2020-09-10T00:00:00Z",
+        price = 100)
+        return assertNotNull(srepo.createSession(session)).id
     }
 
     @Test
@@ -51,9 +60,9 @@ class SessionAppTest {
     }
 
     @Test
-    fun `list cinema`() = testApp {
-        val f1 = createFilm("Some like it hot")
-        val f2 = createFilm("Great race")
+    fun `list film`() = testApp {
+        val f1 = insertFilm("Some like it hot")
+        val f2 = insertFilm("Great race")
 
         handleRequest(HttpMethod.Get, "/film").apply {
             assertEquals(200, response.status()?.value)
@@ -73,7 +82,7 @@ class SessionAppTest {
 
     @Test
     fun `get film`() = testApp {
-        val f1 = createFilm("Some like it hot")
+        val f1 = insertFilm("Some like it hot")
         handleRequest(HttpMethod.Get, "/film/$f1").apply {
             assertEquals(HttpStatusCode.OK, response.status())
             val expected = buildJsonObject {
@@ -86,7 +95,7 @@ class SessionAppTest {
 
     @Test
     fun `delete film`() = testApp {
-        val f1 = createFilm("Some like it hot")
+        val f1 = insertFilm("Some like it hot")
         handleRequest(HttpMethod.Delete, "/film/$f1").apply {
             assertEquals(HttpStatusCode.OK, response.status())
             val expected = buildJsonObject {
@@ -98,6 +107,44 @@ class SessionAppTest {
         handleRequest(HttpMethod.Get, "/film/$f1").apply {
             assertEquals(HttpStatusCode.NotFound, response.status())
             assertEquals("Not found by $f1", response.content)
+        }
+    }
+
+    @Test
+    fun `create session`() = testApp {
+        val f1 = insertFilm("Some like it hot")
+        handleRequest(HttpMethod.Post, "/session") {
+            addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            setBody(buildJsonObject {
+                put("film", f1)
+                put("hall", 1)
+                put("date", "2020-09-10T00:00:00Z")
+                put("price", 100)
+            }.toString())
+        }.apply {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertNotNull(response.content)
+        }
+    }
+
+    @Test
+    fun `list session`() = testApp {
+        val f1 = insertFilm("Some like it hot")
+        val s1 = insertSession(f1, 1)
+        insertSession(f1, 2)
+
+        handleRequest(HttpMethod.Get, "/session?hall=1").apply {
+            assertEquals(200, response.status()?.value)
+            val expected = buildJsonArray {
+                add(buildJsonObject {
+                    put("id", s1)
+                    put("film", f1)
+                    put("hall", 1)
+                    put("date", "2020-09-10T00:00:00Z")
+                    put("price", 100)
+                })
+            }.toString()
+            assertEquals(expected, response.content)
         }
     }
 
