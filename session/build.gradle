@@ -10,7 +10,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes "Main-Class": "org.mgaidamak.SesssionAppKt"
+        attributes "Main-Class": "org.mgaidamak.cinema.session.SessionAppKt"
     }
 }
 

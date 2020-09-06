@@ -34,7 +34,7 @@ abstract class IPublicRepo {
         val hlist = hallClient.get<List<AdminHall>>(path = hpath)
         // Get session list
         // TODO process date
-        val harg = hlist.map { "hall=${it.id}" }.joinToString { "?" }
+        val harg = hlist.joinToString(separator = "&") { "hall=${it.id}" }
         val spath = "/session?$harg"
         println("Try $spath")
         val slist = sessionClient.get<List<AdminSession>>(path = spath)

@@ -83,35 +83,81 @@ private class SuccessRepo: MockPublicRepo() {
     }
 
     override fun sessionGet(url: String): Pair<String, HttpStatusCode> {
-        TODO("Not yet implemented")
+        return when (url) {
+            "/session?hall=10&hall=11" -> {
+                buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 1)
+                        put("film", 1)
+                        put("hall", 11)
+                        put("date", "2020-06-01T10:15:30+01:00")
+                        put("price", 100)
+                    })
+                    add(buildJsonObject {
+                        put("id", 2)
+                        put("film", 2)
+                        put("hall", 11)
+                        put("date", "2020-06-01T10:15:30+01:00")
+                        put("price", 200)
+                    })
+                }.toString() to HttpStatusCode.OK
+            }
+            "/film/1" -> {
+                buildJsonObject {
+                    put("id", 1)
+                    put("name", "Some like it hot")
+                }.toString() to HttpStatusCode.OK
+            }
+            "/film/2" -> {
+                buildJsonObject {
+                    put("id", 2)
+                    put("name", "Great race")
+                }.toString() to HttpStatusCode.OK
+            }
+            else -> "" to HttpStatusCode.NotFound
+        }
     }
 
     override fun ticketGet(url: String): Pair<String, HttpStatusCode> {
-        TODO("Not yet implemented")
+        return when (url) {
+            else -> "" to HttpStatusCode.NotFound
+        }
     }
 
     override fun hallPost(url: String): Pair<String, HttpStatusCode> {
-        TODO("Not yet implemented")
+        return when (url) {
+            else -> "" to HttpStatusCode.NotFound
+        }
     }
 
     override fun sessionPost(url: String): Pair<String, HttpStatusCode> {
-        TODO("Not yet implemented")
+        return when (url) {
+            else -> "" to HttpStatusCode.NotFound
+        }
     }
 
     override fun ticketPost(url: String): Pair<String, HttpStatusCode> {
-        TODO("Not yet implemented")
+        return when (url) {
+            else -> "" to HttpStatusCode.NotFound
+        }
     }
 
     override fun hallDelete(url: String): Pair<String, HttpStatusCode> {
-        TODO("Not yet implemented")
+        return when (url) {
+            else -> "" to HttpStatusCode.NotFound
+        }
     }
 
     override fun sessionDelete(url: String): Pair<String, HttpStatusCode> {
-        TODO("Not yet implemented")
+        return when (url) {
+            else -> "" to HttpStatusCode.NotFound
+        }
     }
 
     override fun ticketDelete(url: String): Pair<String, HttpStatusCode> {
-        TODO("Not yet implemented")
+        return when (url) {
+            else -> "" to HttpStatusCode.NotFound
+        }
     }
 }
 
@@ -133,6 +179,30 @@ class SuccessTest {
                     put("name", "Cosmos")
                     put("city", "Novosibirsk")
                     put("address", "Bogdashka")
+                })
+            }.toString()
+            assertEquals(expected, response.content)
+        }
+    }
+
+    @Test
+    fun `get session list`() = testApp {
+        handleRequest(HttpMethod.Get, "/public/session?cinema=2").apply {
+            assertEquals(200, response.status()?.value)
+            val expected = buildJsonArray {
+                add(buildJsonObject {
+                    put("id", 1)
+                    put("film", "Some like it hot")
+                    put("hall", 11)
+                    put("date", "2020-06-01T10:15:30+01:00")
+                    put("price", 100)
+                })
+                add(buildJsonObject {
+                    put("id", 2)
+                    put("film", "Great race")
+                    put("hall", 11)
+                    put("date", "2020-06-01T10:15:30+01:00")
+                    put("price", 200)
                 })
             }.toString()
             assertEquals(expected, response.content)

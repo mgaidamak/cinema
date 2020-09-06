@@ -3,12 +3,20 @@ package org.mgaidamak.cinema.session
 import io.ktor.http.*
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import org.mgaidamak.cinema.session.dao.Film
 import org.mgaidamak.cinema.session.dao.film.DbFilmRepo
 import org.mgaidamak.cinema.session.dao.film.DbFilmRepoTest
 import org.mgaidamak.cinema.session.dao.session.DbSessionRepo
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNotSame
 
 class SessionAppTest {
     @Test
@@ -19,11 +27,90 @@ class SessionAppTest {
         }
     }
 
+    @BeforeTest
+    fun `clean up`() {
+        frepo.clear()
+    }
+
+    private fun createFilm(name: String): Int {
+        val film = Film(name = name)
+        return assertNotNull(frepo.createFilm(film)).id
+    }
+
+    @Test
+    fun `create film`() = testApp {
+        handleRequest(HttpMethod.Post, "/film") {
+            addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            setBody(buildJsonObject {
+                put("name", "Some like it hot")
+            }.toString())
+        }.apply {
+            assertEquals(HttpStatusCode.OK, response.status())
+            assertNotNull(response.content)
+        }
+    }
+
+    @Test
+    fun `list cinema`() = testApp {
+        val f1 = createFilm("Some like it hot")
+        val f2 = createFilm("Great race")
+
+        handleRequest(HttpMethod.Get, "/film").apply {
+            assertEquals(200, response.status()?.value)
+            val expected = buildJsonArray {
+                add(buildJsonObject {
+                    put("id", f1)
+                    put("name", "Some like it hot")
+                })
+                add(buildJsonObject {
+                    put("id", f2)
+                    put("name", "Great race")
+                })
+            }.toString()
+            assertEquals(expected, response.content)
+        }
+    }
+
+    @Test
+    fun `get film`() = testApp {
+        val f1 = createFilm("Some like it hot")
+        handleRequest(HttpMethod.Get, "/film/$f1").apply {
+            assertEquals(HttpStatusCode.OK, response.status())
+            val expected = buildJsonObject {
+                put("id", f1)
+                put("name", "Some like it hot")
+            }.toString()
+            assertEquals(expected, response.content)
+        }
+    }
+
+    @Test
+    fun `delete film`() = testApp {
+        val f1 = createFilm("Some like it hot")
+        handleRequest(HttpMethod.Delete, "/film/$f1").apply {
+            assertEquals(HttpStatusCode.OK, response.status())
+            val expected = buildJsonObject {
+                put("id", f1)
+                put("name", "Some like it hot")
+            }.toString()
+            assertEquals(expected, response.content)
+        }
+        handleRequest(HttpMethod.Get, "/film/$f1").apply {
+            assertEquals(HttpStatusCode.NotFound, response.status())
+            assertEquals("Not found by $f1", response.content)
+        }
+    }
+
     private fun testApp(callback: TestApplicationEngine.() -> Unit) {
         withTestApplication({
             common()
-            film(DbFilmRepo(DbFilmRepoTest.url))
-            session(DbSessionRepo(DbFilmRepoTest.url))
+            film(frepo)
+            session(srepo)
         }, callback)
+    }
+
+    companion object {
+        val frepo = DbFilmRepo(DbFilmRepoTest.url)
+        val srepo = DbSessionRepo(DbFilmRepoTest.url)
     }
 }

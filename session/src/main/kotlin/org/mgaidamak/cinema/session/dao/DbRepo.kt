@@ -12,7 +12,7 @@ abstract class DbRepo(val url: String,
                 connection.createStatement().use { it.executeUpdate(sql) }
             }
         } catch (e: Exception) {
-            println(e)
+            e.printStackTrace()
         }
     }
 
@@ -26,7 +26,7 @@ abstract class DbRepo(val url: String,
                 }
             }
         } catch (e: Exception) {
-            println(e)
+            e.printStackTrace()
             0
         }
     }

@@ -48,7 +48,7 @@ class DbFilmRepo(url: String,
                 }
             }
         } catch (e: Exception) {
-            println(e)
+            e.printStackTrace()
             emptyList()
         }
     }
@@ -64,7 +64,7 @@ class DbFilmRepo(url: String,
                 }
             }
         } catch (e: Exception) {
-            println(e)
+            e.printStackTrace()
             null
         }
     }
