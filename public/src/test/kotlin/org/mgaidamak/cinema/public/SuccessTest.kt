@@ -33,6 +33,51 @@ private class SuccessRepo: MockPublicRepo() {
                     })
                 }.toString() to HttpStatusCode.OK
             }
+            "/hall?cinema=1" -> {
+                buildJsonArray { }.toString() to HttpStatusCode.OK
+            }
+            "/hall?cinema=2" -> {
+                buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 10)
+                        put("cinema", 2)
+                        put("name", "Big")
+                    })
+                    add(buildJsonObject {
+                        put("id", 11)
+                        put("cinema", 2)
+                        put("name", "Small")
+                    })
+                }.toString() to HttpStatusCode.OK
+            }
+            "/seat?hall=11" -> {
+                buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 100)
+                        put("hall", 11)
+                        put("x", 1)
+                        put("y", 1)
+                    })
+                    add(buildJsonObject {
+                        put("id", 101)
+                        put("hall", 11)
+                        put("x", 1)
+                        put("y", 2)
+                    })
+                    add(buildJsonObject {
+                        put("id", 102)
+                        put("hall", 11)
+                        put("x", 2)
+                        put("y", 1)
+                    })
+                    add(buildJsonObject {
+                        put("id", 103)
+                        put("hall", 11)
+                        put("x", 2)
+                        put("y", 2)
+                    })
+                }.toString() to HttpStatusCode.OK
+            }
             else -> "" to HttpStatusCode.NotFound
         }
     }
@@ -50,12 +95,23 @@ class SuccessTest {
                     put("name", "Pobeda")
                     put("city", "Novosibirsk")
                     put("address", "Lenina")
+                    put("halls", buildJsonArray { })
                 })
                 add(buildJsonObject {
                     put("id", 2)
                     put("name", "Cosmos")
                     put("city", "Novosibirsk")
                     put("address", "Bogdashka")
+                    put("halls", buildJsonArray {
+                        add(buildJsonObject {
+                            put("id", 10)
+                            put("name", "Big")
+                        })
+                        add(buildJsonObject {
+                            put("id", 11)
+                            put("name", "Small")
+                        })
+                    })
                 })
             }.toString()
             assertEquals(expected, response.content)

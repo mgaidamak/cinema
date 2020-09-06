@@ -2,17 +2,22 @@ package org.mgaidamak.cinema.public.dao
 
 import java.time.ZonedDateTime
 
+/**
+ * Public cinema data
+ */
 data class Cinema(
     val id: Int = 0,
     val name: String,
     val city: String,
-    val address: String
+    val address: String,
+    val halls: Collection<Hall>
 ) {
-    constructor(adminCinema: AdminCinema): this(
+    constructor(adminCinema: AdminCinema, halls: Collection<Hall>): this(
         id = adminCinema.id,
         name = adminCinema.name,
         city = adminCinema.city,
-        address = adminCinema.address)
+        address = adminCinema.address,
+        halls = halls)
 }
 
 data class AdminCinema(
@@ -23,7 +28,43 @@ data class AdminCinema(
     val timezone: String
 )
 
+/**
+ * Public hall data
+ */
+data class Hall(
+    val id: Int = 0,
+    val name: String
+) {
+    constructor(adminHall: AdminHall): this(
+        id = adminHall.id,
+        name = adminHall.name)
+}
+
+data class AdminHall(
+    val id: Int = 0,
+    val cinema: Int,
+    val name: String
+)
+
+/**
+ * Public session data
+ */
 data class Session(
+    val id: Int = 0,
+    val film: String,
+    val hall: Int,
+    val date: ZonedDateTime,
+    val price: Int
+) {
+    constructor(adminSession: AdminSession, film: String): this(
+        id = adminSession.id,
+        film = film,
+        hall = adminSession.hall,
+        date = adminSession.date,
+        price = adminSession.price)
+}
+
+data class AdminSession(
     val id: Int = 0,
     val film: Int,
     val hall: Int,
@@ -31,19 +72,68 @@ data class Session(
     val price: Int
 )
 
+data class AdminFilm(
+    val id: Int = 0,
+    val name: String
+)
+
+/**
+ * Public seat/ticket data
+ */
 data class Seat(
     val id: Int = 0,
     val x: Int,
     val y: Int,
     val status: Int
+) {
+    constructor(adminSeat: AdminSeat, status: Int): this(
+        id = adminSeat.id,
+        x = adminSeat.x,
+        y = adminSeat.y,
+        status = status)
+}
+
+data class AdminSeat(
+    val id: Int = 0,
+    val hall: Int,
+    val x: Int,
+    val y: Int
 )
 
+/**
+ * Public bill data
+ */
 data class Bill(
     val id: Int = 0,
     val customer: Int,
     val session: Int,
     val status: Int,
-    val seats: List<Seat>
+    val total: Int,
+    val seats: Collection<Seat>,
+) {
+    constructor(adminBill: AdminBill, seats: Collection<Seat>): this(
+        id = adminBill.id,
+        customer = adminBill.customer,
+        session = adminBill.session,
+        status = adminBill.status,
+        total = adminBill.status,
+        seats = seats)
+}
+
+data class AdminBill(
+    val id: Int = 0,
+    val customer: Int,
+    val session: Int,
+    val status: Int,
+    val total: Int
+)
+
+data class AdminTicket(
+    val id: Int = 0,
+    val bill: Int = 0,
+    val session: Int,
+    val seat: Int,
+    val status: Int
 )
 
 data class Page(

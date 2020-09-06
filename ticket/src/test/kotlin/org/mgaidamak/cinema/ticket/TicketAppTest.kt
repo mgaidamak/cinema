@@ -20,6 +20,7 @@ class TicketAppTest {
 
     private fun testApp(callback: TestApplicationEngine.() -> Unit) {
         withTestApplication({
+            common()
             bill(repo)
         }, callback)
     }

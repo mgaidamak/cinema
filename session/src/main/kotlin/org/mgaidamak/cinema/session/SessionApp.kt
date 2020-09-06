@@ -14,6 +14,8 @@ import io.ktor.server.netty.*
 import io.ktor.util.KtorExperimentalAPI
 import org.mgaidamak.cinema.session.dao.film.DbFilmRepo
 import org.mgaidamak.cinema.session.dao.film.IFilmRepo
+import org.mgaidamak.cinema.session.dao.session.DbSessionRepo
+import org.mgaidamak.cinema.session.dao.session.ISessionRepo
 import java.util.Properties
 
 @KtorExperimentalAPI
@@ -30,12 +32,15 @@ fun main(args: Array<String>) {
             setProperty("user", config.property("postgres.user").getString())
             setProperty("password", config.property("postgres.password").getString())
         }
-        module { film(DbFilmRepo(url, props)) }
+        module {
+            film(DbFilmRepo(url, props))
+            session(DbSessionRepo(url, props))
+        }
     }
     embeddedServer(Netty, env).start(true)
 }
 
-fun Application.film(repo: IFilmRepo) {
+fun Application.common() {
     install(ContentNegotiation) {
         gson {
         }
@@ -46,9 +51,20 @@ fun Application.film(repo: IFilmRepo) {
             call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
         }
     }
+}
+
+fun Application.film(repo: IFilmRepo) {
     routing {
         SessionApiServer().apply {
             registerFilm(repo)
+        }
+    }
+}
+
+fun Application.session(repo: ISessionRepo) {
+    routing {
+        SessionApiServer().apply {
+            registerSession(repo)
         }
     }
 }

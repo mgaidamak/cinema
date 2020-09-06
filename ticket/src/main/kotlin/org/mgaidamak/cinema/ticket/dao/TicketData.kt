@@ -13,7 +13,7 @@ data class Bill(
         set.getInt(3), set.getInt(4), set.getInt(5))
 }
 
-data class Seat(
+data class Ticket(
     val id: Int = 0,
     val bill: Int = 0,
     val session: Int,

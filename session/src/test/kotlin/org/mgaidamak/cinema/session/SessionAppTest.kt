@@ -6,6 +6,7 @@ import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
 import org.mgaidamak.cinema.session.dao.film.DbFilmRepo
 import org.mgaidamak.cinema.session.dao.film.DbFilmRepoTest
+import org.mgaidamak.cinema.session.dao.session.DbSessionRepo
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -20,11 +21,9 @@ class SessionAppTest {
 
     private fun testApp(callback: TestApplicationEngine.() -> Unit) {
         withTestApplication({
-            film(repo)
+            common()
+            film(DbFilmRepo(DbFilmRepoTest.url))
+            session(DbSessionRepo(DbFilmRepoTest.url))
         }, callback)
-    }
-
-    companion object {
-        val repo = DbFilmRepo(DbFilmRepoTest.url)
     }
 }

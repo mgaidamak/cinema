@@ -14,6 +14,8 @@ import io.ktor.server.netty.*
 import io.ktor.util.KtorExperimentalAPI
 import org.mgaidamak.cinema.ticket.dao.bill.DbBillRepo
 import org.mgaidamak.cinema.ticket.dao.bill.IBillRepo
+import org.mgaidamak.cinema.ticket.dao.ticket.DbTicketRepo
+import org.mgaidamak.cinema.ticket.dao.ticket.ITicketRepo
 import java.util.Properties
 
 @KtorExperimentalAPI
@@ -30,12 +32,16 @@ fun main(args: Array<String>) {
             setProperty("user", config.property("postgres.user").getString())
             setProperty("password", config.property("postgres.password").getString())
         }
-        module { bill(DbBillRepo(url, props)) }
+        module {
+            common()
+            bill(DbBillRepo(url, props))
+            ticket(DbTicketRepo(url, props))
+        }
     }
     embeddedServer(Netty, env).start(true)
 }
 
-fun Application.bill(repo: IBillRepo) {
+fun Application.common() {
     install(ContentNegotiation) {
         gson {
         }
@@ -46,12 +52,20 @@ fun Application.bill(repo: IBillRepo) {
             call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
         }
     }
+}
+
+fun Application.bill(repo: IBillRepo) {
     routing {
-        get("/") {
-            call.respondText("My Ticket App", ContentType.Text.Html)
+        TicketApiServer().apply {
+            registerBill(repo)
         }
-        // TicketApiServer(repo).apply {
-        //     registerFilm()
-        // }
+    }
+}
+
+fun Application.ticket(repo: ITicketRepo) {
+    routing {
+        TicketApiServer().apply {
+            registerTicket(repo)
+        }
     }
 }

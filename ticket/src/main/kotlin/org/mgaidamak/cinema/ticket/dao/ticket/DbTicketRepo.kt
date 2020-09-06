@@ -1,7 +1,7 @@
-package org.mgaidamak.cinema.ticket.dao.seat
+package org.mgaidamak.cinema.ticket.dao.ticket
 
 import org.mgaidamak.cinema.ticket.dao.DbRepo
-import org.mgaidamak.cinema.ticket.dao.Seat
+import org.mgaidamak.cinema.ticket.dao.Ticket
 
 import java.sql.DriverManager
 import java.sql.ResultSet
@@ -10,21 +10,21 @@ import java.util.Properties
 /**
  * Production ready repository on PostgreSQL
  */
-class DbSeatRepo(url: String,
-                 props: Properties = Properties()): DbRepo<Seat>(url, props), ISeatRepo {
+class DbTicketRepo(url: String,
+                   props: Properties = Properties()): DbRepo<Ticket>(url, props), ITicketRepo {
 
-    override fun form(rs: ResultSet) = Seat(rs)
+    override fun form(rs: ResultSet) = Ticket(rs)
 
-    override fun createSeat(seat: Seat): Seat? {
+    override fun createTicket(ticket: Ticket): Ticket? {
         val sql = """INSERT INTO seat (bill, session, seat, status)
                      VALUES (?, ?, ?, ?) RETURNING id, bill, session, seat, status"""
         return try {
             DriverManager.getConnection(url, props).use { connection ->
                 connection.prepareStatement(sql).use { ps ->
-                    ps.setInt(1, seat.bill)
-                    ps.setInt(2, seat.session)
-                    ps.setInt(3, seat.seat)
-                    ps.setInt(4, seat.status)
+                    ps.setInt(1, ticket.bill)
+                    ps.setInt(2, ticket.session)
+                    ps.setInt(3, ticket.seat)
+                    ps.setInt(4, ticket.status)
                     ps.executeQuery().use { rs ->
                         if (rs.next()) form(rs) else null
                     }
@@ -36,7 +36,7 @@ class DbSeatRepo(url: String,
         }
     }
 
-    override fun getSeats(session: Int): Collection<Seat> {
+    override fun getTickets(session: Int): Collection<Ticket> {
         val sql = "SELECT id, bill, session, seat, status FROM seat WHERE session = ?"
         return try {
             DriverManager.getConnection(url, props).use { connection ->
@@ -51,7 +51,7 @@ class DbSeatRepo(url: String,
         }
     }
 
-    override fun getSeat(session: Int, seat: Int): Seat? {
+    override fun getTicket(session: Int, seat: Int): Ticket? {
         val sql = "SELECT id, bill, session, seat, status FROM seat WHERE session = ? AND seat = ?"
         return try {
             DriverManager.getConnection(url, props).use { connection ->
@@ -69,12 +69,12 @@ class DbSeatRepo(url: String,
         }
     }
 
-    override fun deleteSeatById(id: Int): Seat? {
+    override fun deleteTicketById(id: Int): Ticket? {
         val sql = "DELETE FROM seat WHERE id = ? RETURNING id, bill, session, seat, status"
         return single(id, sql)
     }
 
-    override fun deleteSeatByBill(bill: Int): Collection<Seat> {
+    override fun deleteTicketByBill(bill: Int): Collection<Ticket> {
         val sql = "DELETE FROM seat WHERE bill = ? RETURNING id, bill, session, seat, status"
         return try {
             DriverManager.getConnection(url, props).use { connection ->

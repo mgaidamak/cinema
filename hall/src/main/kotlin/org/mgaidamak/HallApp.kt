@@ -35,6 +35,7 @@ fun main(args: Array<String>) {
             setProperty("password", config.property("postgres.password").getString())
         }
         module {
+            common()
             cinema(DbCinemaRepo(url, props))
             hall(DbHallRepo(url, props))
             seat(DbSeatRepo(url, props))
@@ -43,7 +44,7 @@ fun main(args: Array<String>) {
     embeddedServer(Netty, env).start(true)
 }
 
-fun Application.cinema(repo: ICinemaRepo) {
+fun Application.common() {
     install(ContentNegotiation) {
         gson {
         }
@@ -54,6 +55,9 @@ fun Application.cinema(repo: ICinemaRepo) {
             call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
         }
     }
+}
+
+fun Application.cinema(repo: ICinemaRepo) {
     routing {
         HallApiServer().apply {
             registerCinema(repo)

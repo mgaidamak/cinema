@@ -8,8 +8,6 @@
 1. Кинотеатры (Cinema)
 2. Залы (Hall)
 3. Места в зале (Seat)
-4. Тарифы (Tariff)
-5. Цены (Price)
 
 Параметры кинотеатра:
 1. ID (autoincrement)
@@ -28,18 +26,6 @@
 2. HallID (REFERENCES Hall)
 3. X (Номер ряда)
 4. Y (Номер места)
-5. Sector (Номер в тарифной сетке)
-
-Параметры тарифа
-1. ID (autoincrement)
-2. CinemaID (REFERENCES Cinema)
-3. Name
-
-Цены это сочетание цены и номера в тарифной сетке:
-1. ID (autoincrement)
-2. TariffID (REFERENCES Tariff)
-3. Sector (Номер в тарифной сетке)
-4. Price (Цена)
 
 # Запросы
 

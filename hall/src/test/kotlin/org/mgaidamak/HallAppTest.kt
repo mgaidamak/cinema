@@ -270,6 +270,7 @@ class HallAppTest {
 
     private fun testApp(callback: TestApplicationEngine.() -> Unit) {
         withTestApplication({
+            common()
             cinema(crepo)
             hall(hrepo)
             seat(srepo)

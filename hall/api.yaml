@@ -38,14 +38,6 @@ paths:
         required: false
         schema:
           type: string
-      - name: sort
-        in: query
-        description: Fields to sort
-        required: false
-        schema:
-          type: array
-          items:
-            format: string
       - name: page
         in: query
         description: Offset-based strategy pagination
@@ -137,14 +129,6 @@ paths:
           schema:
             type: integer
             format: int32
-        - name: sort
-          in: query
-          description: Fields to sort
-          required: false
-          schema:
-            type: array
-            items:
-              format: string
         - name: page
           in: query
           description: Offset-based strategy pagination
@@ -216,21 +200,6 @@ paths:
       summary: Create new seat
       description: Create new seat
       operationId: createSeat
-      parameters:
-        - name: cinema
-          in: query
-          description: Search at cinema
-          required: true
-          schema:
-            type: integer
-            format: int32
-        - name: hall
-          in: query
-          description: Search at hall
-          required: true
-          schema:
-            type: integer
-            format: int32
       requestBody:
         content:
           'application/json':
@@ -248,13 +217,6 @@ paths:
       description: Get all seats
       operationId: getSeats
       parameters:
-        - name: cinema
-          in: query
-          description: Search at cinema
-          required: true
-          schema:
-            type: integer
-            format: int32
         - name: hall
           in: query
           description: Search at hall
@@ -262,14 +224,6 @@ paths:
           schema:
             type: integer
             format: int32
-        - name: sort
-          in: query
-          description: Fields to sort
-          required: false
-          schema:
-            type: array
-            items:
-              format: string
         - name: page
           in: query
           description: Offset-based strategy pagination
@@ -283,7 +237,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Hall'
+                  $ref: '#/components/schemas/Seat'
   /seat/{id}:
     get:
       summary: Get seat by ID
@@ -384,14 +338,10 @@ components:
         y:
           type: integer
           format: int32
-        sector:
-          type: integer
-          format: int32
       required:
       - hall
       - x
       - y
-      - sector
     Page:
       type: object
       properties:
