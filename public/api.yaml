@@ -229,6 +229,7 @@ components:
           type: integer
           format: int32
         status:
+          description: 0 free, 1 reserved, 2 sold
           type: integer
           format: int32
     Order:

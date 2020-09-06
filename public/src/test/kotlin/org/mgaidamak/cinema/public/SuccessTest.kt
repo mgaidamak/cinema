@@ -127,23 +127,12 @@ class SuccessTest {
                     put("name", "Pobeda")
                     put("city", "Novosibirsk")
                     put("address", "Lenina")
-                    put("halls", buildJsonArray { })
                 })
                 add(buildJsonObject {
                     put("id", 2)
                     put("name", "Cosmos")
                     put("city", "Novosibirsk")
                     put("address", "Bogdashka")
-                    put("halls", buildJsonArray {
-                        add(buildJsonObject {
-                            put("id", 10)
-                            put("name", "Big")
-                        })
-                        add(buildJsonObject {
-                            put("id", 11)
-                            put("name", "Small")
-                        })
-                    })
                 })
             }.toString()
             assertEquals(expected, response.content)

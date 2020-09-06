@@ -69,10 +69,6 @@ class SessionApiServer {
             get {
                 println("Get ${call.request.uri}")
                 val film = call.parameters["film"]?.toIntOrNull()
-                if (film == null) {
-                    call.respond(HttpStatusCode.BadRequest, "No film parameter")
-                    return@get
-                }
                 val hall = call.parameters.getAll("hall")
                     ?.stream()?.mapToInt { s -> s.toInt(10) }?.toArray()?.toTypedArray()
                     ?: emptyArray()

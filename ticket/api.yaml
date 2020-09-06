@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: Session API
-  description: Session API for Administrator
+  title: Ticket API
+  description: Ticket API for Administrator
   version: 1.0.0
   contact:
     name: Mikhail Gaidamaka
@@ -10,34 +10,35 @@ info:
 servers:
   - url: 'http://localhost:8080'
 paths:
-  /film:
+  /bill:
     post:
-      summary: Create new film
-      description: Create new film
-      operationId: createFilm
+      summary: Create new bill
+      description: Create new bill
+      operationId: createBill
       requestBody:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/Film'
+              $ref: '#/components/schemas/Bill'
       responses:
         200:
-          description: Film has been created
+          description: Bill has been created
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Film'
+                $ref: '#/components/schemas/Bill'
     get:
-      summary: Get all films
-      description: Get all films
-      operationId: getFilms
+      summary: Get all bills
+      description: Get all bills
+      operationId: getBills
       parameters:
-      - name: name
+      - name: session
         in: query
-        description: Search by substring
-        required: false
+        description: Search by session
+        required: true
         schema:
-          type: string
+          type: integer
+          format: int32
       - name: page
         in: query
         description: Offset-based strategy pagination
@@ -45,200 +46,204 @@ paths:
           $ref: '#/components/schemas/Page'
       responses:
         200:
-          description: List of films
+          description: List of bills
           content:
             'application/json':
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Film'
-  /film/{id}:
+                  $ref: '#/components/schemas/Bill'
+  /bill/{id}:
     get:
-      summary: Get film by ID
-      description: Get film by ID
-      operationId: getFilmById
+      summary: Get bill by ID
+      description: Get bill by ID
+      operationId: getBillById
       parameters:
       - name: id
         in: path
-        description: ID of film
+        description: ID of bill
         required: true
         schema: 
           type: integer
           format: int32
       responses:
         200:
-          description: Film associated with ID
+          description: Bill associated with ID
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Film'
+                $ref: '#/components/schemas/Bill'
         400:
           description: Invalid id (not int32)
         404:
-          description: Film not found
+          description: Bill not found
     delete:
-      summary: Delete film by ID
+      summary: Delete bill by ID
       description: Delete film by ID
-      operationId: deleteCinemaById
+      operationId: deleteBillById
       parameters:
         - name: id
           in: path
-          description: ID of film
+          description: ID of bill
           required: true
           schema:
             type: integer
             format: int32
       responses:
         200:
-          description: Previous film associated with ID
+          description: Previous bill associated with ID
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Film'
+                $ref: '#/components/schemas/Bill'
         400:
           description: Invalid id (not int32)
         404:
-          description: Film not found
+          description: Bill not found
 
-  /session:
+  /ticket:
     post:
-      summary: Create new session
-      description: Create new session
-      operationId: createSession
+      summary: Create new ticket
+      description: Create new ticket
+      operationId: createTicket
       requestBody:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/Session'
+              $ref: '#/components/schemas/Ticket'
       responses:
         200:
-          description: Session has been created
+          description: Ticket has been created
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Session'
+                $ref: '#/components/schemas/Ticket'
     get:
-      summary: Get all sessions
-      description: Get all sessions
-      operationId: getSessions
+      summary: Get all tickets
+      description: Get all sessticketsions
+      operationId: getTickets
       parameters:
-        - name: film
+        - name: session
           in: query
-          description: Search film
-          required: false
+          description: Search by session
+          required: true
           schema:
             type: integer
             format: int32
-        - name: hall
-          in: query
-          description: Search hall
-          required: true
-          schema:
-            type: array
-            items:
-              type: integer
-              format: int32
         - name: page
           in: query
           description: Offset-based strategy pagination
           schema:
-            $ref: '#/components/schemas/Page'
+            $ref: '#/components/schemas/Ticket'
       responses:
         200:
-          description: List of sessions
+          description: List of tickets
           content:
             'application/json':
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Session'
+                  $ref: '#/components/schemas/Ticket'
         400:
-          description: No hall parameter
-  /session/{id}:
+          description: No session parameter
+  /ticket/{id}:
     get:
-      summary: Get session by ID
-      description: Get session by ID
-      operationId: getSessionById
+      summary: Get ticket by ID
+      description: Get ticket by ID
+      operationId: getTicketById
       parameters:
         - name: id
           in: path
-          description: ID of session
+          description: ID of ticket
           required: true
           schema:
             type: integer
             format: int32
       responses:
         200:
-          description: Session associated with ID
+          description: Ticket associated with ID
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Session'
+                $ref: '#/components/schemas/Ticket'
         400:
           description: Invalid id (not int32)
         404:
-          description: Session not found
+          description: Ticket not found
     delete:
-      summary: Delete session by ID
-      description: Delete session by ID
-      operationId: deleteSessionById
+      summary: Delete ticket by ID
+      description: Delete ticket by ID
+      operationId: deleteTicketById
       parameters:
         - name: id
           in: path
-          description: ID of session
+          description: ID of ticket
           required: true
           schema:
             type: integer
             format: int32
       responses:
         200:
-          description: Previous session associated with ID
+          description: Previous ticket associated with ID
           content:
             'application/json':
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Session'
+                  $ref: '#/components/schemas/Ticket'
         400:
           description: Invalid id (not int32)
         404:
-          description: Session not found
+          description: Ticket not found
 
 components:
   schemas:
-    Film:
+    Bill:
       type: object
       properties:
         id:
           type: integer
           format: int32
-        name:
-          type: string
+        customer:
+          type: integer
+          format: int32
+        session:
+          type: integer
+          format: int32
+        status:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int32
       required:
-      - name
-    Session:
+        - customer
+        - session
+        - status
+        - total
+    Ticket:
       type: object
       properties:
         id:
           type: integer
           format: int32
-        film:
+        bill:
           type: integer
           format: int32
-        hall:
+        session:
           type: integer
           format: int32
-        date:
-          type: string
-          format: date-time
-        price:
+        seat:
+          type: integer
+          format: int32
+        status:
           type: integer
           format: int32
       required:
-      - film
-      - hall
-      - date
-      - price
+        - bill
+        - session
+        - seat
+        - status
     Page:
       type: object
       properties:

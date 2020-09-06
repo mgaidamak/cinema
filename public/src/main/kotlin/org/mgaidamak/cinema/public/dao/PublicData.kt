@@ -9,15 +9,13 @@ data class Cinema(
     val id: Int = 0,
     val name: String,
     val city: String,
-    val address: String,
-    val halls: Collection<Hall>
+    val address: String
 ) {
-    constructor(adminCinema: AdminCinema, halls: Collection<Hall>): this(
+    constructor(adminCinema: AdminCinema): this(
         id = adminCinema.id,
         name = adminCinema.name,
         city = adminCinema.city,
-        address = adminCinema.address,
-        halls = halls)
+        address = adminCinema.address)
 }
 
 data class AdminCinema(
