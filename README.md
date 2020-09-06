@@ -46,6 +46,8 @@ docker-контейнер).
 16. Добавить везде конструкторы ResultSet
 17. Нормальная обработка исключений в Repo
 18. Попробовать [MockK](https://mockk.io/), рассказать друзьям
+19. Добавить в сеанс признак закрытия продаж билетов (администратор сам решает, когда его
+устанавливать - сразу после начала или через полчаса)
 
 ### Пользовательские сценарии
 
@@ -112,6 +114,8 @@ docker-контейнер).
 ```
 ./gradlew shadowJar
 docker build -t cinema-hall hall/
+docker build -t cinema-session hall/
+docker build -t cinema-ticket hall/
 docker build -t cinema-public public/
 docker-compose up
 ```

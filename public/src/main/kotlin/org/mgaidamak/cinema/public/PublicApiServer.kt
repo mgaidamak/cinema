@@ -57,6 +57,7 @@ class PublicApiServer(val repo: IPublicRepo) {
                 post {
                     println("Post ${call.request.uri}")
                     val body: Bill = call.receive()
+                    println("Body $body")
                     repo.postBill(body)?.also { call.respond(it) }
                         ?: call.respond(HttpStatusCode.NotFound, "Not created")
                 }

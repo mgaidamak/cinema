@@ -24,14 +24,6 @@ paths:
           required: false
           schema:
             type: string
-        - name: sort
-          in: query
-          description: Fields to sort
-          required: false
-          schema:
-            type: array
-            items:
-              format: string
         - name: page
           in: query
           description: Offset-based strategy pagination

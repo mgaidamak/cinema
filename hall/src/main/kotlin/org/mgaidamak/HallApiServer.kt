@@ -22,13 +22,15 @@ class HallApiServer {
         }
         route("/cinema") {
             post {
-                println("Post ${call.request.uri}")
+                println("Get ${call.request.uri}")
                 val body: Cinema = call.receive()
+                println("Body $body")
                 repo.createCinema(body)?.also { call.respond(it) }
                     ?: call.respond(HttpStatusCode.NotFound, "Not created")
             }
             get {
                 println("Get ${call.request.uri}")
+                println("Params ${call.parameters}")
                 val city = call.parameters["city"]
                 val page = Page(0, 10)
                 val sort = listOf("id")
@@ -38,6 +40,7 @@ class HallApiServer {
         route("/cinema/{id}") {
             get {
                 println("Get ${call.request.uri}")
+                println("Params ${call.parameters}")
                 val id = call.request.document().toIntOrNull()
                 if (id == null) {
                     call.respond(HttpStatusCode.BadRequest, "Invalid id")
@@ -64,11 +67,13 @@ class HallApiServer {
             post {
                 println("Post ${call.request.uri}")
                 val body: Hall = call.receive()
+                println("Body $body")
                 repo.createHall(body)?.also { call.respond(it) }
                     ?: call.respond(HttpStatusCode.NotFound, "Not created")
             }
             get {
                 println("Get ${call.request.uri}")
+                println("Params ${call.parameters}")
                 val cinema = call.parameters["cinema"]?.toIntOrNull()
                 if (cinema == null) {
                     call.respond(HttpStatusCode.BadRequest, "No cinema parameter")
@@ -82,6 +87,7 @@ class HallApiServer {
         route("/hall/{id}") {
             get {
                 println("Get ${call.request.uri}")
+                println("Params ${call.parameters}")
                 val id = call.request.document().toIntOrNull()
                 if (id == null) {
                     call.respond(HttpStatusCode.BadRequest, "Invalid id")
@@ -108,11 +114,13 @@ class HallApiServer {
             post {
                 println("Post ${call.request.uri}")
                 val body: Seat = call.receive()
+                println("Body $body")
                 repo.createSeat(body)?.also { call.respond(it) }
                     ?: call.respond(HttpStatusCode.NotFound, "Not created")
             }
             get {
                 println("Get ${call.request.uri}")
+                println("Params ${call.parameters}")
                 val hall = call.parameters["hall"]?.toIntOrNull()
                 if (hall == null) {
                     call.respond(HttpStatusCode.BadRequest, "Invalid hall")
@@ -125,6 +133,7 @@ class HallApiServer {
         route("/seat/{id}") {
             get {
                 println("Get ${call.request.uri}")
+                println("Params ${call.parameters}")
                 val id = call.request.document().toIntOrNull()
                 if (id == null) {
                     call.respond(HttpStatusCode.BadRequest, "Invalid id")

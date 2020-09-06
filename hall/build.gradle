@@ -1,11 +1,11 @@
 description = 'Hall application'
 
 dependencies {
-    compile "io.ktor:ktor-server-netty:$ktor_version"
-    compile "io.ktor:ktor-gson:$ktor_version"
-    compile "org.postgresql:postgresql:$jdbc_version"
-    testCompile "io.ktor:ktor-server-test-host:$ktor_version"
-    testCompile "org.testcontainers:postgresql:$tc_version"
+    implementation "io.ktor:ktor-server-netty:$ktor_version"
+    implementation "io.ktor:ktor-gson:$ktor_version"
+    implementation "org.postgresql:postgresql:$jdbc_version"
+    testImplementation "io.ktor:ktor-server-test-host:$ktor_version"
+    testImplementation "org.testcontainers:postgresql:$tc_version"
 }
 
 jar {
