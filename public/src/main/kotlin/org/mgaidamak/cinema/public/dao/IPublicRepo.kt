@@ -132,7 +132,7 @@ abstract class IPublicRepo {
         val ticketPath = "/ticket?bill=$id"
         println("Try $ticketPath")
         val adminTickets = ticketClient.get<List<AdminTicket>>(path = ticketPath)
-        val seats = ArrayList<Seat>()
+        val seats = ArrayList<Seat>(adminTickets.size)
         for (adminTicket in adminTickets) {
             // Get seat information
             val seatPath = "/seat/${adminTicket.seat}"

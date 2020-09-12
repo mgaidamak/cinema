@@ -81,6 +81,14 @@ private class SuccessRepo: MockPublicRepo() {
                     })
                 }.toString() to HttpStatusCode.OK
             }
+            "/seat/102" -> {
+                buildJsonObject {
+                    put("id", 102)
+                    put("hall", 11)
+                    put("x", 2)
+                    put("y", 1)
+                }.toString() to HttpStatusCode.OK
+            }
             else -> "" to HttpStatusCode.NotFound
         }
     }
@@ -146,6 +154,26 @@ private class SuccessRepo: MockPublicRepo() {
                         put("bill", 4)
                         put("session", 2)
                         put("seat", 101)
+                        put("status", 2)
+                    })
+                }.toString() to HttpStatusCode.OK
+            }
+            "/bill/10" -> {
+                buildJsonObject {
+                    put("id", 10)
+                    put("customer", 7)
+                    put("session", 2)
+                    put("status", 1)
+                    put("total", 200)
+                }.toString() to HttpStatusCode.OK
+            }
+            "/ticket?bill=10" -> {
+                buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 1)
+                        put("bill", 11)
+                        put("session", 2)
+                        put("seat", 102)
                         put("status", 2)
                     })
                 }.toString() to HttpStatusCode.OK
@@ -304,6 +332,29 @@ class SuccessTest {
                 })
             }.toString())
         }.apply {
+            assertEquals(200, response.status()?.value)
+            val expected = buildJsonObject {
+                put("id", 10)
+                put("customer", 7)
+                put("session", 2)
+                put("status", 1)
+                put("total", 200)
+                put("seats", buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 102)
+                        put("x", 2)
+                        put("y", 1)
+                        put("status", 2)
+                    })
+                })
+            }.toString()
+            assertEquals(expected, response.content)
+        }
+    }
+
+    @Test
+    fun `get bill`() = testApp {
+        handleRequest(HttpMethod.Get, "/public/bill/10").apply {
             assertEquals(200, response.status()?.value)
             val expected = buildJsonObject {
                 put("id", 10)
