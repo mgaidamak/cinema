@@ -146,6 +146,8 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Ticket'
+        409:
+          description: Seat has been already sold
     get:
       summary: Get all tickets
       description: Get all tickets

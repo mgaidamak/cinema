@@ -12,6 +12,9 @@ import java.time.LocalDate
 
 /**
  * Stateless repository, that process all public requests to admin api
+ * TODO make it CRUD only
+ * return object/code only
+ * all chains move to api routes
  */
 abstract class IPublicRepo {
 
