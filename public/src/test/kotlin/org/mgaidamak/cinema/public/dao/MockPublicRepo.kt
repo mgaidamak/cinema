@@ -38,7 +38,7 @@ abstract class MockPublicRepo: IPublicRepo() {
                             respond(pair.first, pair.second, responseHeaders)
                         }
                         HttpMethod.Patch -> {
-                            val pair = deleter(request.url.encodedPath)
+                            val pair = patcher(request.url.encodedPath)
                             val responseHeaders = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
                             respond(pair.first, pair.second, responseHeaders)
                         }

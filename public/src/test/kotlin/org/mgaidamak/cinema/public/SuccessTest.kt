@@ -185,7 +185,7 @@ private class SuccessRepo: MockPublicRepo() {
                     put("id", 10)
                     put("customer", 7)
                     put("session", 2)
-                    put("status", 2)
+                    put("status", 1)
                     put("total", 200)
                 }.toString() to HttpStatusCode.OK
             }
@@ -285,7 +285,7 @@ class SuccessTest {
         }
     }
 
-    // TODO fix test
+    @Test
     fun `post bill`() = testApp {
         handleRequest(HttpMethod.Post, "/public/bill") {
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
@@ -293,7 +293,7 @@ class SuccessTest {
                 put("customer", 7)
                 put("session", 2)
                 put("status", 0)
-                put("total", 400)
+                put("total", 200)
                 put("seats", buildJsonArray {
                     add(buildJsonObject {
                         put("id", 102)

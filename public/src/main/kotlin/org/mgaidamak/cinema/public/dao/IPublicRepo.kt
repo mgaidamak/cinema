@@ -99,6 +99,7 @@ abstract class IPublicRepo {
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         }
         // Post tickets
+        val soldSeats = ArrayList<Seat>(bill.seats.size)
         val ticketPath = "/ticket"
         println("Try $ticketPath")
         for (seat in bill.seats) {
@@ -107,6 +108,7 @@ abstract class IPublicRepo {
             ticketClient.post<AdminTicket>(path = ticketPath, body = ticketBody) {
                 header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             }
+            soldSeats.add(seat.copy(status = 2))
         }
         // Confirm bill status
         val patchPath = "/bill/${newBill.id}"
@@ -115,7 +117,7 @@ abstract class IPublicRepo {
         val patchBill = ticketClient.patch<AdminBill>(path = patchPath, body = patchBody) {
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         }
-        return Bill(patchBill, bill.seats)
+        return Bill(patchBill, soldSeats)
     }
 
     /**

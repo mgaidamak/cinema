@@ -20,10 +20,13 @@ abstract class IBillRepoTest(private val repo: IBillRepo) {
 
     @Test
     open fun `create bill`() {
-        val bill = Bill(customer = 1, session = 2, status = 0, total = 0)
-        assertNotNull(repo.createBill(bill))
-        assertNotNull(repo.createBill(bill))
+        val bill = Bill(customer = 1, session = 2, status = 0, total = 100)
+        val first = assertNotNull(repo.createBill(bill))
+        val second = assertNotNull(repo.createBill(bill))
         assertEquals(2, repo.total())
+        assertEquals(second.id, first.id + 1)
+        val noidBill = first.copy(id = 0)
+        assertEquals(bill, noidBill)
     }
 
     @Test

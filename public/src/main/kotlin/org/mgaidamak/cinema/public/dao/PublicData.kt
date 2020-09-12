@@ -114,7 +114,7 @@ data class Bill(
         customer = adminBill.customer,
         session = adminBill.session,
         status = adminBill.status,
-        total = adminBill.status,
+        total = adminBill.total,
         seats = seats)
 }
 
