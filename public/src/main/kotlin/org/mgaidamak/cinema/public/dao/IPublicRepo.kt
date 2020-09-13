@@ -8,7 +8,6 @@ import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
-import java.time.LocalDate
 
 /**
  * Stateless repository, that process all public requests to admin api
@@ -25,68 +24,49 @@ abstract class IPublicRepo {
     /**
      * Get available cinema at my city
      */
-    suspend fun getCinemas(city: String?): Collection<Cinema> {
+    suspend fun getCinemas(city: String?): Collection<AdminCinema> {
         // Get available cinema at my city
         val path = "/cinema".plus(city?.let { "?city=$city" } ?: "")
         println("Try $path")
-        val list = hallClient.get<List<AdminCinema>>(path = path)
-        return list.map { Cinema(it) }
+        return hallClient.get<List<AdminCinema>>(path = path)
     }
 
-    /**
-     * Get available session at cinema
-     */
-    suspend fun getSessions(cinema: Int, date: LocalDate): Collection<Session> {
+    suspend fun getHalls(cinema: Int): Collection<AdminHall> {
         // Get hall list
         val hpath = "/hall?cinema=$cinema"
         println("Try $hpath")
-        val hlist = hallClient.get<List<AdminHall>>(path = hpath)
-        // Get session list
-        // TODO process date
-        val harg = hlist.joinToString(separator = "&") { "hall=${it.id}" }
-        val spath = "/session?$harg"
-        println("Try $spath")
-        val slist = sessionClient.get<List<AdminSession>>(path = spath)
-        val result = ArrayList<Session>(slist.size)
-        // it can be global application hashmap
-        val films = HashMap<Int, String>()
-        // Enrich with film name
-        for (it in slist) {
-            val id = it.film
-            var film = films[id]
-            if (film == null) {
-                val fpath = "/film/$id"
-                println("Try $fpath")
-                // TODO call suspend fun in FP style
-                film = sessionClient.get<AdminFilm>(path = fpath).let {
-                    films[id] = it.name
-                    it.name
-                }
-            }
-            result.add(Session(it, film))
-        }
-        return result
+        return hallClient.get<List<AdminHall>>(path = hpath)
     }
 
-    /**
-     * Get available seats at hall
-     */
-    suspend fun getSeats(session: Int): Collection<Seat> {
-        // Get full session info
-        val sessionPath = "/session/$session"
-        println("Try $sessionPath")
-        val adminSession = sessionClient.get<AdminSession>(path = sessionPath)
-        // Get seats
-        val seatPath = "/seat?hall=${adminSession.hall}"
-        println("Try $seatPath")
-        val seatList = hallClient.get<List<AdminSeat>>(path = seatPath)
-        // Get sold tickets
-        val ticketPath = "/ticket?session=${adminSession.id}"
+    suspend fun getSessions(halls: IntArray): Collection<AdminSession> {
+        val harg = halls.joinToString(separator = "&") { "hall=$it" }
+        val spath = "/session?$harg"
+        println("Try $spath")
+        return sessionClient.get<List<AdminSession>>(path = spath)
+    }
+
+    suspend fun getFilm(film: Int): AdminFilm {
+        val fpath = "/film/$film"
+        println("Try $fpath")
+        return sessionClient.get(path = fpath)
+    }
+
+    suspend fun getSession(session: Int): AdminSession {
+        val path = "/session/$session"
+        println("Try $path")
+        return sessionClient.get<AdminSession>(path = path)
+    }
+
+    suspend fun getSeats(hall: Int): Collection<AdminSeat> {
+        val path = "/seat?hall=$hall"
+        println("Try $path")
+        return hallClient.get<List<AdminSeat>>(path = path)
+    }
+
+    suspend fun getTockets(session: Int): Collection<AdminTicket> {
+        val ticketPath = "/ticket?session=$session"
         println("Try $ticketPath")
-        val ticketList = ticketClient.get<List<AdminTicket>>(path = ticketPath)
-        val soldMap = ticketList.map { it.seat to it.status }.toMap()
-        // Collect to hall map with status
-        return seatList.map { Seat(it, soldMap.getOrDefault(it.id, 0)) }
+        return ticketClient.get<List<AdminTicket>>(path = ticketPath)
     }
 
     /**
