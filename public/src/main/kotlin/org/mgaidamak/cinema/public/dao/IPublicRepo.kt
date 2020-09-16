@@ -11,9 +11,8 @@ import io.ktor.http.HttpHeaders
 
 /**
  * Stateless repository, that process all public requests to admin api
- * TODO make it CRUD only
- * return object/code only
- * all chains move to api routes
+ * It makes CRUD only
+ * TODO return object/code only
  */
 abstract class IPublicRepo {
 
@@ -54,7 +53,7 @@ abstract class IPublicRepo {
     suspend fun getSession(session: Int): AdminSession {
         val path = "/session/$session"
         println("Try $path")
-        return sessionClient.get<AdminSession>(path = path)
+        return sessionClient.get(path = path)
     }
 
     suspend fun getSeats(hall: Int): Collection<AdminSeat> {
@@ -69,83 +68,53 @@ abstract class IPublicRepo {
         return ticketClient.get<List<AdminTicket>>(path = ticketPath)
     }
 
-    /**
-     * User try to create bill and buy tickets
-     */
-    suspend fun postBill(bill: Bill): Bill? {
+    suspend fun createBill(bill: AdminBill): AdminBill {
         // Post new bill
         val billPath = "/bill"
         println("Try $billPath")
-        val billBody = AdminBill(customer = bill.customer, session = bill.session,
-        status = 0, total = bill.total)
-        val newBill = ticketClient.post<AdminBill>(path = billPath, body = billBody) {
+        return ticketClient.post(path = billPath, body = bill) {
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         }
-        // Post tickets
-        val soldSeats = ArrayList<Seat>(bill.seats.size)
+    }
+
+    suspend fun patchBill(bill: AdminBill): AdminBill {
+        // Post new bill
+        val patchPath = "/bill/${bill.id}"
+        println("Try $patchPath")
+        return ticketClient.patch(path = patchPath, body = bill) {
+            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        }
+    }
+
+    suspend fun createTicket(ticket: AdminTicket): AdminTicket {
         val ticketPath = "/ticket"
         println("Try $ticketPath")
-        for (seat in bill.seats) {
-            val ticketBody = AdminTicket(bill = newBill.id, session = bill.session,
-            seat = seat.id, status = 2)
-            ticketClient.post<AdminTicket>(path = ticketPath, body = ticketBody) {
-                header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-            }
-            soldSeats.add(seat.copy(status = 2))
-        }
-        // Confirm bill status
-        val patchPath = "/bill/${newBill.id}"
-        println("Try $patchPath")
-        val patchBody = newBill.copy(status = 1)
-        val patchBill = ticketClient.patch<AdminBill>(path = patchPath, body = patchBody) {
+        return ticketClient.post(path = ticketPath, body = ticket) {
             header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         }
-        return Bill(patchBill, soldSeats)
     }
 
-    /**
-     * User looking for bill status some time later
-     */
-    suspend fun getBill(id: Int): Bill? {
-        // Show bill status
+    suspend fun getBill(id: Int): AdminBill {
         val billPath = "/bill/$id"
         println("Try $billPath")
-        val adminBill = ticketClient.get<AdminBill>(path = billPath)
-        // Show payed tickets
-        val ticketPath = "/ticket?bill=$id"
-        println("Try $ticketPath")
-        val adminTickets = ticketClient.get<List<AdminTicket>>(path = ticketPath)
-        val seats = ArrayList<Seat>(adminTickets.size)
-        for (adminTicket in adminTickets) {
-            // Get seat information
-            val seatPath = "/seat/${adminTicket.seat}"
-            println("Try $seatPath")
-            val adminSeat = hallClient.get<AdminSeat>(path = seatPath)
-            seats.add(Seat(adminSeat, adminTicket.status))
-        }
-        return Bill(adminBill, seats)
+        return ticketClient.get(path = billPath)
     }
 
-    /**
-     * User wants to return money for tickets
-     */
-    suspend fun deleteBill(id: Int): Bill? {
-        // Show bill status
-        val billPath = "/bill/$id"
-        println("Try $billPath")
-        val adminBill = ticketClient.get<AdminBill>(path = billPath)
-        // Delete payed tickets
+    suspend fun getBillTickets(id: Int): Collection<AdminTicket> {
         val ticketPath = "/ticket?bill=$id"
         println("Try $ticketPath")
-        val adminTickets = ticketClient.delete<List<AdminTicket>>(path = ticketPath)
-        val seats = adminTickets.map { Seat(it.seat, 0, 0, 0) }
-        // Patch bill status
-        val patchPath = "/bill/$id"
-        println("Try $patchPath")
-        val patchBody = adminBill.copy(status = 3)
-        val patchBill = ticketClient.patch<AdminBill>(path = patchPath, body = patchBody) {
-            header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-        }
-        return Bill(patchBill, seats)
+        return ticketClient.get<List<AdminTicket>>(path = ticketPath)
+    }
+
+    suspend fun deleteBillTickets(id: Int): Collection<AdminTicket> {
+        val ticketPath = "/ticket?bill=$id"
+        println("Try $ticketPath")
+        return ticketClient.delete<List<AdminTicket>>(path = ticketPath)
+    }
+
+    suspend fun getSeat(id: Int): AdminSeat {
+        val seatPath = "/seat/$id"
+        println("Try $seatPath")
+        return hallClient.get(path = seatPath)
     }
 }

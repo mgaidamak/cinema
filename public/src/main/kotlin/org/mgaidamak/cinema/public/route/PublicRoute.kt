@@ -1,5 +1,7 @@
 package org.mgaidamak.cinema.public.route
 
+import org.mgaidamak.cinema.public.dao.AdminBill
+import org.mgaidamak.cinema.public.dao.AdminTicket
 import org.mgaidamak.cinema.public.dao.Bill
 import org.mgaidamak.cinema.public.dao.Cinema
 import org.mgaidamak.cinema.public.dao.IPublicRepo
@@ -44,14 +46,43 @@ class PublicRoute(val repo: IPublicRepo): IPublicRoute {
     }
 
     override suspend fun postBill(bill: Bill): Bill? {
-        TODO("Not yet implemented")
+        // Post new bill
+        val billBody = AdminBill(customer = bill.customer, session = bill.session,
+            status = 0, total = bill.total)
+        val newBill = repo.createBill(billBody)
+        // Post tickets
+        val soldSeats = ArrayList<Seat>(bill.seats.size)
+        for (seat in bill.seats) {
+            val ticketBody = AdminTicket(bill = newBill.id, session = bill.session,
+                seat = seat.id, status = 2)
+            repo.createTicket(ticketBody)
+            soldSeats.add(seat.copy(status = 2))
+        }
+        // Confirm bill status
+        val patchBody = newBill.copy(status = 1)
+        val patchBill = repo.patchBill(patchBody)
+        return Bill(patchBill, soldSeats)
     }
 
     override suspend fun getBill(id: Int): Bill? {
-        TODO("Not yet implemented")
+        // Show bill status
+        val bill = repo.getBill(id)
+        // Show payed tickets
+        val tickets = repo.getBillTickets(id)
+        val seats = ArrayList<Seat>(tickets.size)
+        for (adminTicket in tickets) {
+            // Get seat information
+            seats.add(Seat(repo.getSeat(adminTicket.seat), adminTicket.status))
+        }
+        return Bill(bill, seats)
     }
 
     override suspend fun deleteBill(id: Int): Bill? {
-        TODO("Not yet implemented")
+        val bill = repo.getBill(id)
+        val adminTickets = repo.deleteBillTickets(id)
+        val seats = adminTickets.map { Seat(it.seat, 0, 0, 0) }
+        val patchBody = bill.copy(status = 3)
+        val patchBill = repo.patchBill(patchBody)
+        return Bill(patchBill, seats)
     }
 }
