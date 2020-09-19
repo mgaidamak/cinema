@@ -61,6 +61,10 @@ services:
     environment:
       - HALLHOST=hall
       - HALLPORT=8080
+      - SESSIONHOST=session
+      - SESSIONPORT=8080
+      - TICKETHOST=ticket
+      - TICKETPORT=8080
     ports:
       # host:container
       - "8084:8080"

@@ -3,7 +3,6 @@ package org.mgaidamak.cinema.public
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
@@ -11,213 +10,65 @@ import io.ktor.server.testing.withTestApplication
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import org.mgaidamak.cinema.public.dao.MockPublicRepo
+import org.mgaidamak.cinema.public.dao.Bill
+import org.mgaidamak.cinema.public.dao.Cinema
+import org.mgaidamak.cinema.public.dao.Seat
+import org.mgaidamak.cinema.public.dao.Session
+import org.mgaidamak.cinema.public.route.IPublicRoute
+import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-private class SuccessRepo: MockPublicRepo() {
-    override fun hallGet(url: String): Pair<String, HttpStatusCode> {
-        return when (url) {
-            "/cinema?city=Novosibirsk" -> {
-                buildJsonArray {
-                    add(buildJsonObject {
-                        put("id", 1)
-                        put("name", "Pobeda")
-                        put("city", "Novosibirsk")
-                        put("address", "Lenina")
-                        put("timezone", "Asia/Novosibirsk")
-                    })
-                    add(buildJsonObject {
-                        put("id", 2)
-                        put("name", "Cosmos")
-                        put("city", "Novosibirsk")
-                        put("address", "Bogdashka")
-                        put("timezone", "Asia/Novosibirsk")
-                    })
-                }.toString() to HttpStatusCode.OK
-            }
-            "/hall?cinema=1" -> {
-                buildJsonArray { }.toString() to HttpStatusCode.OK
-            }
-            "/hall?cinema=2" -> {
-                buildJsonArray {
-                    add(buildJsonObject {
-                        put("id", 10)
-                        put("cinema", 2)
-                        put("name", "Big")
-                    })
-                    add(buildJsonObject {
-                        put("id", 11)
-                        put("cinema", 2)
-                        put("name", "Small")
-                    })
-                }.toString() to HttpStatusCode.OK
-            }
-            "/seat?hall=11" -> {
-                buildJsonArray {
-                    add(buildJsonObject {
-                        put("id", 100)
-                        put("hall", 11)
-                        put("x", 1)
-                        put("y", 1)
-                    })
-                    add(buildJsonObject {
-                        put("id", 101)
-                        put("hall", 11)
-                        put("x", 1)
-                        put("y", 2)
-                    })
-                    add(buildJsonObject {
-                        put("id", 102)
-                        put("hall", 11)
-                        put("x", 2)
-                        put("y", 1)
-                    })
-                    add(buildJsonObject {
-                        put("id", 103)
-                        put("hall", 11)
-                        put("x", 2)
-                        put("y", 2)
-                    })
-                }.toString() to HttpStatusCode.OK
-            }
-            "/seat/102" -> {
-                buildJsonObject {
-                    put("id", 102)
-                    put("hall", 11)
-                    put("x", 2)
-                    put("y", 1)
-                }.toString() to HttpStatusCode.OK
-            }
-            else -> "" to HttpStatusCode.NotFound
+private class SuccessRoute: IPublicRoute {
+    override suspend fun getCinemas(city: String?): Collection<Cinema> {
+        return when(city) {
+            "Novosibirsk" -> listOf(
+                Cinema(1, "Pobeda", "Novosibirsk", "Lenina"),
+                Cinema(2, "Cosmos", "Novosibirsk", "Bogdashka")
+            )
+            else -> emptyList()
         }
     }
 
-    override fun sessionGet(url: String): Pair<String, HttpStatusCode> {
-        return when (url) {
-            "/session?hall=10&hall=11" -> {
-                buildJsonArray {
-                    add(buildJsonObject {
-                        put("id", 1)
-                        put("film", 1)
-                        put("hall", 11)
-                        put("date", "2020-09-10T00:00:00Z")
-                        put("price", 100)
-                    })
-                    add(buildJsonObject {
-                        put("id", 2)
-                        put("film", 2)
-                        put("hall", 11)
-                        put("date", "2020-09-10T03:00:00Z")
-                        put("price", 200)
-                    })
-                }.toString() to HttpStatusCode.OK
-            }
-            "/film/1" -> {
-                buildJsonObject {
-                    put("id", 1)
-                    put("name", "Some like it hot")
-                }.toString() to HttpStatusCode.OK
-            }
-            "/film/2" -> {
-                buildJsonObject {
-                    put("id", 2)
-                    put("name", "Great race")
-                }.toString() to HttpStatusCode.OK
-            }
-            "/session/2" -> {
-                buildJsonObject {
-                    put("id", 2)
-                    put("film", 2)
-                    put("hall", 11)
-                    put("date", "2020-09-10T03:00:00Z")
-                    put("price", 200)
-                }.toString() to HttpStatusCode.OK
-            }
-            else -> "" to HttpStatusCode.NotFound
+    override suspend fun getSessions(cinema: Int, date: LocalDate): Collection<Session> {
+        return when(cinema) {
+            2 -> listOf(
+                Session(1, "Some like it hot", 11, "2020-09-10T00:00:00Z", 100),
+                Session(2, "Great race", 11, "2020-09-10T03:00:00Z", 200),
+            )
+            else -> emptyList()
         }
     }
 
-    override fun ticketGet(url: String): Pair<String, HttpStatusCode> {
-        return when (url) {
-            "/ticket?session=2" -> {
-                buildJsonArray {
-                    add(buildJsonObject {
-                        put("id", 1)
-                        put("bill", 4)
-                        put("session", 2)
-                        put("seat", 100)
-                        put("status", 2)
-                    })
-                    add(buildJsonObject {
-                        put("id", 2)
-                        put("bill", 4)
-                        put("session", 2)
-                        put("seat", 101)
-                        put("status", 2)
-                    })
-                }.toString() to HttpStatusCode.OK
-            }
-            "/bill/10" -> {
-                buildJsonObject {
-                    put("id", 10)
-                    put("customer", 7)
-                    put("session", 2)
-                    put("status", 1)
-                    put("total", 200)
-                }.toString() to HttpStatusCode.OK
-            }
-            "/ticket?bill=10" -> {
-                buildJsonArray {
-                    add(buildJsonObject {
-                        put("id", 1)
-                        put("bill", 11)
-                        put("session", 2)
-                        put("seat", 102)
-                        put("status", 2)
-                    })
-                }.toString() to HttpStatusCode.OK
-            }
-            else -> "" to HttpStatusCode.NotFound
+    override suspend fun getSeats(session: Int): Collection<Seat> {
+        return when(session) {
+            2 -> listOf(
+                Seat(100, 1, 1, 2),
+                Seat(101, 1, 2, 2),
+                Seat(102, 2, 1, 0),
+                Seat(103, 2, 2, 0)
+            )
+            else -> emptyList()
         }
     }
 
-    override fun ticketPost(url: String): Pair<String, HttpStatusCode> {
-        return when (url) {
-            "/bill" -> {
-                buildJsonObject {
-                    put("id", 10)
-                    put("customer", 7)
-                    put("session", 2)
-                    put("status", 0)
-                    put("total", 200)
-                }.toString() to HttpStatusCode.OK
-            }
-            "/ticket" -> {
-                buildJsonObject {
-                    put("id", 11)
-                    put("bill", 10)
-                    put("session", 2)
-                    put("seat", 102)
-                    put("status", 2)
-                }.toString() to HttpStatusCode.OK
-            }
-            else -> "" to HttpStatusCode.NotFound
+    override suspend fun postBill(bill: Bill) =
+        Bill(10, 7, 2, 1, 200,
+            listOf(Seat(102, 2, 1, 2)))
+
+    override suspend fun getBill(id: Int): Bill? {
+        return when(id) {
+            10 -> Bill(10, 7, 2, 1, 200,
+                listOf(Seat(102, 2, 1, 2)))
+            else -> null
         }
     }
 
-    override fun ticketPatch(url: String): Pair<String, HttpStatusCode> {
-        return when (url) {
-            "/bill/10" -> {
-                buildJsonObject {
-                    put("id", 10)
-                    put("customer", 7)
-                    put("session", 2)
-                    put("status", 1)
-                    put("total", 200)
-                }.toString() to HttpStatusCode.OK
-            }
-            else -> "" to HttpStatusCode.NotFound
+    override suspend fun deleteBill(id: Int): Bill? {
+        return when(id) {
+            10 -> Bill(10, 7, 2, 3, 200,
+                listOf(Seat(102, 2, 1, 2)))
+            else -> null
         }
     }
 }
@@ -375,9 +226,32 @@ class SuccessTest {
         }
     }
 
+    @Test
+    fun `delete bill`() = testApp {
+        handleRequest(HttpMethod.Delete, "/public/bill/10").apply {
+            assertEquals(200, response.status()?.value)
+            val expected = buildJsonObject {
+                put("id", 10)
+                put("customer", 7)
+                put("session", 2)
+                put("status", 3)
+                put("total", 200)
+                put("seats", buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 102)
+                        put("x", 2)
+                        put("y", 1)
+                        put("status", 2)
+                    })
+                })
+            }.toString()
+            assertEquals(expected, response.content)
+        }
+    }
+
     private fun testApp(callback: TestApplicationEngine.() -> Unit) {
         withTestApplication({
-            public(SuccessRepo())
+            public(SuccessRoute())
         }, callback)
     }
 }

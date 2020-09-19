@@ -8,9 +8,10 @@ import io.ktor.request.receive
 import io.ktor.request.uri
 import org.mgaidamak.cinema.public.dao.IPublicRepo
 import org.mgaidamak.cinema.public.dao.Bill
+import org.mgaidamak.cinema.public.route.IPublicRoute
 import java.time.LocalDate
 
-class PublicApiServer(val repo: IPublicRepo) {
+class PublicApiServer(private val route: IPublicRoute) {
 
     fun Routing.public() {
         route("/public") {
@@ -18,7 +19,7 @@ class PublicApiServer(val repo: IPublicRepo) {
                 println("Get ${call.request.uri}")
                 println("Params ${call.parameters}")
                 val city = call.parameters["city"]
-                repo.getCinemas(city).also { call.respond(it) }
+                route.getCinemas(city).also { call.respond(it) }
             }
             get("/session") {
                 println("Get ${call.request.uri}")
@@ -30,7 +31,7 @@ class PublicApiServer(val repo: IPublicRepo) {
                 }
                 val date = call.parameters["date"]?.let { d -> LocalDate.parse(d) }
                     ?: LocalDate.now()
-                repo.getSessions(cinema, date).also { call.respond(it) }
+                route.getSessions(cinema, date).also { call.respond(it) }
             }
             get("/seat") {
                 println("Get ${call.request.uri}")
@@ -40,13 +41,13 @@ class PublicApiServer(val repo: IPublicRepo) {
                     call.respond(HttpStatusCode.BadRequest, "Invalid session")
                     return@get
                 }
-                repo.getSeats(session).also { call.respond(it) }
+                route.getSeats(session).also { call.respond(it) }
             }
             post("/bill") {
                 println("Post ${call.request.uri}")
                 val body: Bill = call.receive()
                 println("Body $body")
-                repo.postBill(body)?.also { call.respond(it) }
+                route.postBill(body)?.also { call.respond(it) }
                     ?: call.respond(HttpStatusCode.NotFound, "Not created")
             }
             route("/bill/{id}") {
@@ -58,7 +59,7 @@ class PublicApiServer(val repo: IPublicRepo) {
                         call.respond(HttpStatusCode.BadRequest, "Invalid id")
                         return@get
                     }
-                    repo.getBill(id)?.also { call.respond(it) }
+                    route.getBill(id)?.also { call.respond(it) }
                         ?: call.respond(HttpStatusCode.NotFound, "Not found by $id")
                 }
                 delete {
@@ -69,7 +70,7 @@ class PublicApiServer(val repo: IPublicRepo) {
                         call.respond(HttpStatusCode.BadRequest, "Invalid id")
                         return@delete
                     }
-                    repo.deleteBill(id)?.also { call.respond(it) }
+                    route.deleteBill(id)?.also { call.respond(it) }
                         ?: call.respond(HttpStatusCode.NotFound, "Not found by $id")
                 }
             }

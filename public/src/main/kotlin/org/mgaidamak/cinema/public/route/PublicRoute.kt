@@ -40,7 +40,7 @@ class PublicRoute(val repo: IPublicRepo): IPublicRoute {
     override suspend fun getSeats(session: Int): Collection<Seat> {
         val sessionObj = repo.getSession(session)
         val seats = repo.getSeats(sessionObj.hall)
-        val sold = repo.getTockets(session).map { it.seat to it.status }.toMap()
+        val sold = repo.getTickets(session).map { it.seat to it.status }.toMap()
         // Collect to hall map with status
         return seats.map { Seat(it, sold.getOrDefault(it.id, 0)) }
     }

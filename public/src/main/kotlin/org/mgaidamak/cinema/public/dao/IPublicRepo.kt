@@ -20,6 +20,8 @@ abstract class IPublicRepo {
     abstract val sessionClient: HttpClient
     abstract val ticketClient: HttpClient
 
+    // Hall service
+
     /**
      * Get available cinema at my city
      */
@@ -36,6 +38,20 @@ abstract class IPublicRepo {
         println("Try $hpath")
         return hallClient.get<List<AdminHall>>(path = hpath)
     }
+
+    suspend fun getSeats(hall: Int): Collection<AdminSeat> {
+        val path = "/seat?hall=$hall"
+        println("Try $path")
+        return hallClient.get<List<AdminSeat>>(path = path)
+    }
+
+    suspend fun getSeat(id: Int): AdminSeat {
+        val seatPath = "/seat/$id"
+        println("Try $seatPath")
+        return hallClient.get(path = seatPath)
+    }
+
+    // Session service
 
     suspend fun getSessions(halls: IntArray): Collection<AdminSession> {
         val harg = halls.joinToString(separator = "&") { "hall=$it" }
@@ -56,13 +72,9 @@ abstract class IPublicRepo {
         return sessionClient.get(path = path)
     }
 
-    suspend fun getSeats(hall: Int): Collection<AdminSeat> {
-        val path = "/seat?hall=$hall"
-        println("Try $path")
-        return hallClient.get<List<AdminSeat>>(path = path)
-    }
+    // Ticket service
 
-    suspend fun getTockets(session: Int): Collection<AdminTicket> {
+    suspend fun getTickets(session: Int): Collection<AdminTicket> {
         val ticketPath = "/ticket?session=$session"
         println("Try $ticketPath")
         return ticketClient.get<List<AdminTicket>>(path = ticketPath)
@@ -110,11 +122,5 @@ abstract class IPublicRepo {
         val ticketPath = "/ticket?bill=$id"
         println("Try $ticketPath")
         return ticketClient.delete<List<AdminTicket>>(path = ticketPath)
-    }
-
-    suspend fun getSeat(id: Int): AdminSeat {
-        val seatPath = "/seat/$id"
-        println("Try $seatPath")
-        return hallClient.get(path = seatPath)
     }
 }

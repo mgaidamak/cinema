@@ -1,0 +1,142 @@
+package org.mgaidamak.cinema.public.dao
+
+import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+/**
+ * Test Hall part of Public repo with mocked http
+ */
+private class HallRepo: MockPublicRepo() {
+    override fun hallGet(url: String): Pair<String, HttpStatusCode> {
+        return when (url) {
+            "/cinema?city=Novosibirsk" -> {
+                buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 1)
+                        put("name", "Pobeda")
+                        put("city", "Novosibirsk")
+                        put("address", "Lenina")
+                        put("timezone", "Asia/Novosibirsk")
+                    })
+                    add(buildJsonObject {
+                        put("id", 2)
+                        put("name", "Cosmos")
+                        put("city", "Novosibirsk")
+                        put("address", "Bogdashka")
+                        put("timezone", "Asia/Novosibirsk")
+                    })
+                }.toString() to HttpStatusCode.OK
+            }
+            "/hall?cinema=1" -> {
+                buildJsonArray { }.toString() to HttpStatusCode.OK
+            }
+            "/hall?cinema=2" -> {
+                buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 10)
+                        put("cinema", 2)
+                        put("name", "Big")
+                    })
+                    add(buildJsonObject {
+                        put("id", 11)
+                        put("cinema", 2)
+                        put("name", "Small")
+                    })
+                }.toString() to HttpStatusCode.OK
+            }
+            "/seat?hall=11" -> {
+                buildJsonArray {
+                    add(buildJsonObject {
+                        put("id", 100)
+                        put("hall", 11)
+                        put("x", 1)
+                        put("y", 1)
+                    })
+                    add(buildJsonObject {
+                        put("id", 101)
+                        put("hall", 11)
+                        put("x", 1)
+                        put("y", 2)
+                    })
+                    add(buildJsonObject {
+                        put("id", 102)
+                        put("hall", 11)
+                        put("x", 2)
+                        put("y", 1)
+                    })
+                    add(buildJsonObject {
+                        put("id", 103)
+                        put("hall", 11)
+                        put("x", 2)
+                        put("y", 2)
+                    })
+                }.toString() to HttpStatusCode.OK
+            }
+            "/seat/102" -> {
+                buildJsonObject {
+                    put("id", 102)
+                    put("hall", 11)
+                    put("x", 2)
+                    put("y", 1)
+                }.toString() to HttpStatusCode.OK
+            }
+            else -> "" to HttpStatusCode.NotFound
+        }
+    }
+}
+
+class HallPublicTest {
+
+    private val repo = HallRepo()
+
+    @Test
+    fun `get cinema list`() {
+        val cinemas = runBlocking { repo.getCinemas("Novosibirsk") }
+        val expected = listOf(
+            AdminCinema(1, "Pobeda", "Novosibirsk", "Lenina", "Asia/Novosibirsk"),
+            AdminCinema(2, "Cosmos", "Novosibirsk", "Bogdashka", "Asia/Novosibirsk"))
+        assertEquals(expected, cinemas)
+    }
+
+    @Test
+    fun `get empty hall list`() {
+        val halls = runBlocking { repo.getHalls(1) }
+        assertEquals(emptyList(), halls)
+    }
+
+    @Test
+    fun `get hall list`() {
+        val halls = runBlocking { repo.getHalls(2) }
+        val expected = listOf(
+            AdminHall(10, 2, "Big"),
+            AdminHall(11, 2, "Small")
+        )
+        assertEquals(expected, halls)
+    }
+
+    @Test
+    fun `get seat list`() {
+        val seats = runBlocking { repo.getSeats(11) }
+        val expected = listOf(
+            AdminSeat(100, 11, 1, 1),
+            AdminSeat(101, 11, 1, 2),
+            AdminSeat(102, 11, 2, 1),
+            AdminSeat(103, 11, 2, 2)
+        )
+        assertEquals(expected, seats)
+    }
+
+    @Test
+    fun `get seat`() {
+        val seat = runBlocking { repo.getSeat(102) }
+        val expected = AdminSeat(102, 11, 2, 1)
+        assertEquals(expected, seat)
+    }
+
+    // TODO test other Http codes!
+}

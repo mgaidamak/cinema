@@ -15,6 +15,8 @@ import io.ktor.util.KtorExperimentalAPI
 import io.ktor.utils.io.printStack
 import org.mgaidamak.cinema.public.dao.IPublicRepo
 import org.mgaidamak.cinema.public.dao.RestPublicRepo
+import org.mgaidamak.cinema.public.route.IPublicRoute
+import org.mgaidamak.cinema.public.route.PublicRoute
 
 @KtorExperimentalAPI
 fun main(args: Array<String>) {
@@ -24,12 +26,12 @@ fun main(args: Array<String>) {
             host = config.property("ktor.deployment.host").getString()
             port = config.property("ktor.deployment.port").getString().toInt()
         }
-        module { public(RestPublicRepo(config)) }
+        module { public(PublicRoute(RestPublicRepo(config))) }
     }
     embeddedServer(Netty, env).start(true)
 }
 
-fun Application.public(repo: IPublicRepo) {
+fun Application.public(route: IPublicRoute) {
     install(ContentNegotiation) {
         gson {
         }
@@ -45,7 +47,7 @@ fun Application.public(repo: IPublicRepo) {
         get("/") {
             call.respondText("My Public App", ContentType.Text.Html)
         }
-        PublicApiServer(repo).apply {
+        PublicApiServer(route).apply {
             public()
         }
     }
