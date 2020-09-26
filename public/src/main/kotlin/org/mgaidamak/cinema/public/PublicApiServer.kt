@@ -1,17 +1,28 @@
 package org.mgaidamak.cinema.public
 
 import io.ktor.application.*
+import io.ktor.client.features.ClientRequestException
+import io.ktor.client.statement.readText
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.http.*
 import io.ktor.request.receive
 import io.ktor.request.uri
-import org.mgaidamak.cinema.public.dao.IPublicRepo
 import org.mgaidamak.cinema.public.dao.Bill
+import org.mgaidamak.cinema.public.response.Response
 import org.mgaidamak.cinema.public.route.IPublicRoute
 import java.time.LocalDate
 
 class PublicApiServer(private val route: IPublicRoute) {
+
+    private suspend fun <T> ApplicationCall.respond(block: suspend () -> Response<T>) {
+        val res = block()
+        if (res.succeed() && res.data != null) {
+            respond(res.data)
+        } else {
+            respond(res.code, res.message ?: "")
+        }
+    }
 
     fun Routing.public() {
         route("/public") {
@@ -19,7 +30,7 @@ class PublicApiServer(private val route: IPublicRoute) {
                 println("Get ${call.request.uri}")
                 println("Params ${call.parameters}")
                 val city = call.parameters["city"]
-                route.getCinemas(city).also { call.respond(it) }
+                call.respond { route.getCinemas(city) }
             }
             get("/session") {
                 println("Get ${call.request.uri}")
@@ -31,7 +42,7 @@ class PublicApiServer(private val route: IPublicRoute) {
                 }
                 val date = call.parameters["date"]?.let { d -> LocalDate.parse(d) }
                     ?: LocalDate.now()
-                route.getSessions(cinema, date).also { call.respond(it) }
+                call.respond { route.getSessions(cinema, date) }
             }
             get("/seat") {
                 println("Get ${call.request.uri}")
@@ -41,14 +52,13 @@ class PublicApiServer(private val route: IPublicRoute) {
                     call.respond(HttpStatusCode.BadRequest, "Invalid session")
                     return@get
                 }
-                route.getSeats(session).also { call.respond(it) }
+                call.respond { route.getSeats(session) }
             }
             post("/bill") {
                 println("Post ${call.request.uri}")
                 val body: Bill = call.receive()
                 println("Body $body")
-                route.postBill(body)?.also { call.respond(it) }
-                    ?: call.respond(HttpStatusCode.NotFound, "Not created")
+                call.respond { route.postBill(body) }
             }
             route("/bill/{id}") {
                 get {
@@ -59,8 +69,7 @@ class PublicApiServer(private val route: IPublicRoute) {
                         call.respond(HttpStatusCode.BadRequest, "Invalid id")
                         return@get
                     }
-                    route.getBill(id)?.also { call.respond(it) }
-                        ?: call.respond(HttpStatusCode.NotFound, "Not found by $id")
+                    call.respond { route.getBill(id) }
                 }
                 delete {
                     println("Delete ${call.request.uri}")
@@ -70,8 +79,7 @@ class PublicApiServer(private val route: IPublicRoute) {
                         call.respond(HttpStatusCode.BadRequest, "Invalid id")
                         return@delete
                     }
-                    route.deleteBill(id)?.also { call.respond(it) }
-                        ?: call.respond(HttpStatusCode.NotFound, "Not found by $id")
+                    call.respond { route.deleteBill(id) }
                 }
             }
         }

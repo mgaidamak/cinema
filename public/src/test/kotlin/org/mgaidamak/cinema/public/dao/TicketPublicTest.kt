@@ -124,48 +124,55 @@ class TicketPublicTest {
             AdminTicket(1, 4, 2, 100, 2),
             AdminTicket(2, 4, 2, 101, 2)
         )
-        assertEquals(expected, tickets)
+        assertEquals(HttpStatusCode.OK, tickets.code)
+        assertEquals(expected, tickets.data)
     }
 
     @Test
     fun `create bill`() {
         val bill = runBlocking { repo.createBill(AdminBill(0, 7, 2, 0, 200)) }
         val expected = AdminBill(10, 7, 2, 0, 200)
-        assertEquals(expected, bill)
+        assertEquals(HttpStatusCode.OK, bill.code)
+        assertEquals(expected, bill.data)
     }
 
     @Test
     fun `patch bill`() {
         val bill = runBlocking { repo.patchBill(AdminBill(10, 7, 2, 1, 200)) }
         val expected = AdminBill(10, 7, 2, 1, 200)
-        assertEquals(expected, bill)
+        assertEquals(HttpStatusCode.OK, bill.code)
+        assertEquals(expected, bill.data)
     }
 
     @Test
     fun `create ticket`() {
         val bill = runBlocking { repo.createTicket(AdminTicket(0, 10, 2, 102, 2)) }
         val expected = AdminTicket(11, 10, 2, 102, 2)
-        assertEquals(expected, bill)
+        assertEquals(HttpStatusCode.OK, bill.code)
+        assertEquals(expected, bill.data)
     }
 
     @Test
     fun `get bill`() {
         val bill = runBlocking { repo.getBill(10) }
         val expected = AdminBill(10, 7, 2, 1, 200)
-        assertEquals(expected, bill)
+        assertEquals(HttpStatusCode.OK, bill.code)
+        assertEquals(expected, bill.data)
     }
 
     @Test
     fun `get bill tickets`() {
         val bill = runBlocking { repo.getBillTickets(10) }
         val expected = listOf(AdminTicket(11, 10, 2, 102, 2))
-        assertEquals(expected, bill)
+        assertEquals(HttpStatusCode.OK, bill.code)
+        assertEquals(expected, bill.data)
     }
 
     @Test
     fun `delete bill tickets`() {
         val bill = runBlocking { repo.deleteBillTickets(10) }
         val expected = listOf(AdminTicket(11, 10, 2, 102, 2))
-        assertEquals(expected, bill)
+        assertEquals(HttpStatusCode.OK, bill.code)
+        assertEquals(expected, bill.data)
     }
 }

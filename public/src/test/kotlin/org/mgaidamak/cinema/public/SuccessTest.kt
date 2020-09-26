@@ -3,6 +3,7 @@ package org.mgaidamak.cinema.public
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
@@ -14,61 +15,62 @@ import org.mgaidamak.cinema.public.dao.Bill
 import org.mgaidamak.cinema.public.dao.Cinema
 import org.mgaidamak.cinema.public.dao.Seat
 import org.mgaidamak.cinema.public.dao.Session
+import org.mgaidamak.cinema.public.response.Response
 import org.mgaidamak.cinema.public.route.IPublicRoute
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 private class SuccessRoute: IPublicRoute {
-    override suspend fun getCinemas(city: String?): Collection<Cinema> {
+    override suspend fun getCinemas(city: String?): Response<Collection<Cinema>> {
         return when(city) {
-            "Novosibirsk" -> listOf(
+            "Novosibirsk" -> Response(data = listOf(
                 Cinema(1, "Pobeda", "Novosibirsk", "Lenina"),
                 Cinema(2, "Cosmos", "Novosibirsk", "Bogdashka")
-            )
-            else -> emptyList()
+            ))
+            else -> Response(data = emptyList())
         }
     }
 
-    override suspend fun getSessions(cinema: Int, date: LocalDate): Collection<Session> {
+    override suspend fun getSessions(cinema: Int, date: LocalDate): Response<Collection<Session>> {
         return when(cinema) {
-            2 -> listOf(
+            2 -> Response(data = listOf(
                 Session(1, "Some like it hot", 11, "2020-09-10T00:00:00Z", 100),
                 Session(2, "Great race", 11, "2020-09-10T03:00:00Z", 200),
-            )
-            else -> emptyList()
+            ))
+            else -> Response(data = emptyList())
         }
     }
 
-    override suspend fun getSeats(session: Int): Collection<Seat> {
+    override suspend fun getSeats(session: Int): Response<Collection<Seat>> {
         return when(session) {
-            2 -> listOf(
+            2 -> Response(data = listOf(
                 Seat(100, 1, 1, 2),
                 Seat(101, 1, 2, 2),
                 Seat(102, 2, 1, 0),
                 Seat(103, 2, 2, 0)
-            )
-            else -> emptyList()
+            ))
+            else -> Response(data = emptyList())
         }
     }
 
     override suspend fun postBill(bill: Bill) =
-        Bill(10, 7, 2, 1, 200,
-            listOf(Seat(102, 2, 1, 2)))
+        Response(data = Bill(10, 7, 2, 1, 200,
+            listOf(Seat(102, 2, 1, 2))))
 
-    override suspend fun getBill(id: Int): Bill? {
+    override suspend fun getBill(id: Int): Response<Bill> {
         return when(id) {
-            10 -> Bill(10, 7, 2, 1, 200,
-                listOf(Seat(102, 2, 1, 2)))
-            else -> null
+            10 -> Response(data = Bill(10, 7, 2, 1, 200,
+                listOf(Seat(102, 2, 1, 2))))
+            else -> Response(HttpStatusCode.NotFound, "Not found by $id")
         }
     }
 
-    override suspend fun deleteBill(id: Int): Bill? {
+    override suspend fun deleteBill(id: Int): Response<Bill> {
         return when(id) {
-            10 -> Bill(10, 7, 2, 3, 200,
-                listOf(Seat(102, 2, 1, 2)))
-            else -> null
+            10 -> Response(data = Bill(10, 7, 2, 3, 200,
+                listOf(Seat(102, 2, 1, 2))))
+            else -> Response(HttpStatusCode.NotFound, "Not found by $id")
         }
     }
 }

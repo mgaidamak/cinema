@@ -70,20 +70,23 @@ class SessionPublicTest {
             AdminSession(1, 1, 11, "2020-09-10T00:00:00Z", 100),
             AdminSession(2, 2, 11, "2020-09-10T03:00:00Z", 200),
         )
-        assertEquals(expected, sessions)
+        assertEquals(HttpStatusCode.OK, sessions.code)
+        assertEquals(expected, sessions.data)
     }
 
     @Test
     fun `get film`() {
         val film = runBlocking { repo.getFilm(1) }
         val expected = AdminFilm(1, "Some like it hot")
-        assertEquals(expected, film)
+        assertEquals(HttpStatusCode.OK, film.code)
+        assertEquals(expected, film.data)
     }
 
     @Test
     fun `get session`() {
         val session = runBlocking { repo.getSession(2) }
         val expected = AdminSession(2, 2, 11, "2020-09-10T03:00:00Z", 200)
-        assertEquals(expected, session)
+        assertEquals(HttpStatusCode.OK, session.code)
+        assertEquals(expected, session.data)
     }
 }

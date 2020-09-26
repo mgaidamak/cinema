@@ -30,8 +30,8 @@ abstract class IPublicRepo {
         return try {
             Response(data = block())
         } catch (e: ClientRequestException) {
-            Response(code = e.response?.status ?: HttpStatusCode.NotFound,
-                descr = e.response?.readText())
+            Response(e.response?.status ?: HttpStatusCode.NotFound,
+                e.response?.readText())
         }
     }
 
