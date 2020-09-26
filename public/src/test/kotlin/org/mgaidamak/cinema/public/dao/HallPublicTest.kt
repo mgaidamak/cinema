@@ -14,6 +14,9 @@ import kotlin.test.assertEquals
 private class HallRepo: MockPublicRepo() {
     override fun hallGet(url: String): Pair<String, HttpStatusCode> {
         return when (url) {
+            "/cinema?city=Tomsk" -> {
+                buildJsonArray { }.toString() to HttpStatusCode.OK
+            }
             "/cinema?city=Novosibirsk" -> {
                 buildJsonArray {
                     add(buildJsonObject {
@@ -48,6 +51,9 @@ private class HallRepo: MockPublicRepo() {
                         put("name", "Small")
                     })
                 }.toString() to HttpStatusCode.OK
+            }
+            "/seat?hall=10" -> {
+                buildJsonArray { }.toString() to HttpStatusCode.OK
             }
             "/seat?hall=11" -> {
                 buildJsonArray {
@@ -95,6 +101,13 @@ class HallPublicTest {
     private val repo = HallRepo()
 
     @Test
+    fun `get empty cinema list`() {
+        val cinemas = runBlocking { repo.getCinemas("Tomsk") }
+        assertEquals(HttpStatusCode.OK, cinemas.code)
+        assertEquals(emptyList(), cinemas.data)
+    }
+
+    @Test
     fun `get cinema list`() {
         val cinemas = runBlocking { repo.getCinemas("Novosibirsk") }
         val expected = listOf(
@@ -120,6 +133,13 @@ class HallPublicTest {
         )
         assertEquals(HttpStatusCode.OK, halls.code)
         assertEquals(expected, halls.data)
+    }
+
+    @Test
+    fun `get empty seat list`() {
+        val seats = runBlocking { repo.getSeats(10) }
+        assertEquals(HttpStatusCode.OK, seats.code)
+        assertEquals(emptyList(), seats.data)
     }
 
     @Test
