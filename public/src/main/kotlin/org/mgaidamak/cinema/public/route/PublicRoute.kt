@@ -72,7 +72,9 @@ class PublicRoute(val repo: IPublicRepo): IPublicRoute {
         val seats = ArrayList<Seat>(tickets.size)
         for (adminTicket in tickets) {
             // Get seat information
-            seats.add(Seat(repo.getSeat(adminTicket.seat), adminTicket.status))
+            repo.getSeat(adminTicket.seat).data?.apply {
+                seats.add(Seat(this, adminTicket.status))
+            }
         }
         return Bill(bill, seats)
     }

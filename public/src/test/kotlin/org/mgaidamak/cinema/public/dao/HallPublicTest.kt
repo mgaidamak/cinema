@@ -100,13 +100,15 @@ class HallPublicTest {
         val expected = listOf(
             AdminCinema(1, "Pobeda", "Novosibirsk", "Lenina", "Asia/Novosibirsk"),
             AdminCinema(2, "Cosmos", "Novosibirsk", "Bogdashka", "Asia/Novosibirsk"))
-        assertEquals(expected, cinemas)
+        assertEquals(HttpStatusCode.OK, cinemas.code)
+        assertEquals(expected, cinemas.data)
     }
 
     @Test
     fun `get empty hall list`() {
         val halls = runBlocking { repo.getHalls(1) }
-        assertEquals(emptyList(), halls)
+        assertEquals(HttpStatusCode.OK, halls.code)
+        assertEquals(emptyList(), halls.data)
     }
 
     @Test
@@ -116,7 +118,8 @@ class HallPublicTest {
             AdminHall(10, 2, "Big"),
             AdminHall(11, 2, "Small")
         )
-        assertEquals(expected, halls)
+        assertEquals(HttpStatusCode.OK, halls.code)
+        assertEquals(expected, halls.data)
     }
 
     @Test
@@ -128,14 +131,22 @@ class HallPublicTest {
             AdminSeat(102, 11, 2, 1),
             AdminSeat(103, 11, 2, 2)
         )
-        assertEquals(expected, seats)
+        assertEquals(HttpStatusCode.OK, seats.code)
+        assertEquals(expected, seats.data)
     }
 
     @Test
     fun `get seat`() {
         val seat = runBlocking { repo.getSeat(102) }
         val expected = AdminSeat(102, 11, 2, 1)
-        assertEquals(expected, seat)
+        assertEquals(HttpStatusCode.OK, seat.code)
+        assertEquals(expected, seat.data)
+    }
+
+    @Test
+    fun `get wrong seat`() {
+        val r = runBlocking { repo.getSeat(202) }
+        assertEquals(HttpStatusCode.NotFound, r.code)
     }
 
     // TODO test other Http codes!
