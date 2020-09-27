@@ -304,6 +304,7 @@ components:
         status:
           type: integer
           format: int32
+          description: 1 reserved, 2 sold
       required:
         - bill
         - session

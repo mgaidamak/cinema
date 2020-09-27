@@ -93,21 +93,25 @@ class PublicRoute(private val repo: IPublicRepo): IPublicRoute {
     override suspend fun getSeats(session: Int): Response<Collection<Seat>> {
         val sesRes = repo.getSession(session)
         if (!sesRes.succeed() || sesRes.data == null) {
-            return Response(sesRes.code, sesRes.message)
+            return Response(HttpStatusCode.InternalServerError,
+                "Error while load session $session")
         }
 
         val seatsRes = repo.getSeats(sesRes.data.hall)
         if (!seatsRes.succeed()) {
-            return Response(seatsRes.code, seatsRes.message)
+            return Response(HttpStatusCode.InternalServerError,
+                "Error while load hall plan for session $session")
         }
 
         if (seatsRes.data == null || seatsRes.data.isEmpty()) {
-            return Response(HttpStatusCode.InternalServerError, "Sorry, can't load hall plan!")
+            return Response(HttpStatusCode.OK,
+                "No seats available for session $session")
         }
 
         val soldRes = repo.getTickets(session)
         if (!soldRes.succeed()) {
-            return Response(soldRes.code, soldRes.message)
+            return Response(HttpStatusCode.InternalServerError,
+                "Error while load sold tickets for session $session")
         }
 
         val sold = soldRes.data?.map { it.seat to it.status }?.toMap() ?: emptyMap()

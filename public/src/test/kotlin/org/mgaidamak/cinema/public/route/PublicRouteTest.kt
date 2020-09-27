@@ -7,9 +7,12 @@ import kotlinx.coroutines.runBlocking
 import org.mgaidamak.cinema.public.dao.AdminCinema
 import org.mgaidamak.cinema.public.dao.AdminFilm
 import org.mgaidamak.cinema.public.dao.AdminHall
+import org.mgaidamak.cinema.public.dao.AdminSeat
 import org.mgaidamak.cinema.public.dao.AdminSession
+import org.mgaidamak.cinema.public.dao.AdminTicket
 import org.mgaidamak.cinema.public.dao.Cinema
 import org.mgaidamak.cinema.public.dao.IPublicRepo
+import org.mgaidamak.cinema.public.dao.Seat
 import org.mgaidamak.cinema.public.dao.Session
 import org.mgaidamak.cinema.public.response.Response
 import java.time.LocalDate
@@ -54,7 +57,7 @@ class PublicRouteTest {
     }
 
     @Test
-    fun `get halls failed`() {
+    fun `get sessions halls failed`() {
         coEvery { repo.getHalls(1) } returns Response(HttpStatusCode.NotFound)
 
         val response = runBlocking { route.getSessions(1, LocalDate.now()) }
@@ -64,7 +67,7 @@ class PublicRouteTest {
     }
 
     @Test
-    fun `get halls empty`() {
+    fun `get sessions halls empty`() {
         coEvery { repo.getHalls(1) } returns Response(data = emptyList())
 
         val response = runBlocking { route.getSessions(1, LocalDate.now()) }
@@ -147,6 +150,155 @@ class PublicRouteTest {
         )
 
         val response = runBlocking { route.getSessions(1, LocalDate.now()) }
+        assertEquals(HttpStatusCode.OK, response.code)
+        assertEquals(expected, response.data)
+    }
+
+    @Test
+    fun `get seats session failed`() {
+        coEvery { repo.getSession(1) } returns Response(HttpStatusCode.NotFound)
+
+        val response = runBlocking { route.getSeats(1) }
+        assertEquals(HttpStatusCode.InternalServerError, response.code)
+        assertEquals("Error while load session 1", response.message)
+        assertNull(response.data)
+    }
+
+    @Test
+    fun `get seats session is null`() {
+        coEvery { repo.getSession(1) } returns Response()
+
+        val response = runBlocking { route.getSeats(1) }
+        assertEquals(HttpStatusCode.InternalServerError, response.code)
+        assertEquals("Error while load session 1", response.message)
+        assertNull(response.data)
+    }
+
+    @Test
+    fun `get seats failed`() {
+        coEvery { repo.getSession(1) } returns Response(
+            data = AdminSession(1, 1, 1, "2020-09-10T00:00:00Z", 100))
+        coEvery { repo.getSeats(1) } returns Response(HttpStatusCode.NotFound)
+
+        val response = runBlocking { route.getSeats(1) }
+        assertEquals(HttpStatusCode.InternalServerError, response.code)
+        assertEquals("Error while load hall plan for session 1", response.message)
+        assertNull(response.data)
+    }
+
+    @Test
+    fun `get seats null`() {
+        coEvery { repo.getSession(1) } returns Response(
+            data = AdminSession(1, 1, 1, "2020-09-10T00:00:00Z", 100))
+        coEvery { repo.getSeats(1) } returns Response()
+
+        val response = runBlocking { route.getSeats(1) }
+        assertEquals(HttpStatusCode.OK, response.code)
+        assertEquals("No seats available for session 1", response.message)
+        assertNull(response.data)
+    }
+
+    @Test
+    fun `get seats empty`() {
+        coEvery { repo.getSession(1) } returns Response(
+            data = AdminSession(1, 1, 1, "2020-09-10T00:00:00Z", 100))
+        coEvery { repo.getSeats(1) } returns Response(data = emptyList())
+
+        val response = runBlocking { route.getSeats(1) }
+        assertEquals(HttpStatusCode.OK, response.code)
+        assertEquals("No seats available for session 1", response.message)
+        assertNull(response.data)
+    }
+
+    @Test
+    fun `get seats sold failed`() {
+        coEvery { repo.getSession(1) } returns Response(
+            data = AdminSession(1, 1, 1, "2020-09-10T00:00:00Z", 100))
+        coEvery { repo.getSeats(1) } returns Response(data = listOf(
+            AdminSeat(1, 1, 1, 1),
+            AdminSeat(1, 1, 1, 2),
+            AdminSeat(1, 1, 2, 1),
+            AdminSeat(1, 1, 2, 2),
+        ))
+        coEvery { repo.getTickets(1) } returns Response(HttpStatusCode.NotFound)
+
+        val response = runBlocking { route.getSeats(1) }
+        assertEquals(HttpStatusCode.InternalServerError, response.code)
+        assertEquals("Error while load sold tickets for session 1", response.message)
+        assertNull(response.data)
+    }
+
+    @Test
+    fun `get seats sold null`() {
+        coEvery { repo.getSession(1) } returns Response(
+            data = AdminSession(1, 1, 1, "2020-09-10T00:00:00Z", 100))
+        coEvery { repo.getSeats(1) } returns Response(data = listOf(
+            AdminSeat(1, 1, 1, 1),
+            AdminSeat(2, 1, 1, 2),
+            AdminSeat(3, 1, 2, 1),
+            AdminSeat(4, 1, 2, 2),
+        ))
+        coEvery { repo.getTickets(1) } returns Response()
+
+        val expected = listOf(
+            Seat(1, 1, 1, 0),
+            Seat(2, 1, 2, 0),
+            Seat(3, 2, 1, 0),
+            Seat(4, 2, 2, 0),
+        )
+
+        val response = runBlocking { route.getSeats(1) }
+        assertEquals(HttpStatusCode.OK, response.code)
+        assertEquals(expected, response.data)
+    }
+
+    @Test
+    fun `get seats sold empty`() {
+        coEvery { repo.getSession(1) } returns Response(
+            data = AdminSession(1, 1, 1, "2020-09-10T00:00:00Z", 100))
+        coEvery { repo.getSeats(1) } returns Response(data = listOf(
+            AdminSeat(1, 1, 1, 1),
+            AdminSeat(2, 1, 1, 2),
+            AdminSeat(3, 1, 2, 1),
+            AdminSeat(4, 1, 2, 2),
+        ))
+        coEvery { repo.getTickets(1) } returns Response(data = emptyList())
+
+        val expected = listOf(
+            Seat(1, 1, 1, 0),
+            Seat(2, 1, 2, 0),
+            Seat(3, 2, 1, 0),
+            Seat(4, 2, 2, 0),
+        )
+
+        val response = runBlocking { route.getSeats(1) }
+        assertEquals(HttpStatusCode.OK, response.code)
+        assertEquals(expected, response.data)
+    }
+
+    @Test
+    fun `get seats valid`() {
+        coEvery { repo.getSession(1) } returns Response(
+            data = AdminSession(1, 1, 1, "2020-09-10T00:00:00Z", 100))
+        coEvery { repo.getSeats(1) } returns Response(data = listOf(
+            AdminSeat(1, 1, 1, 1),
+            AdminSeat(2, 1, 1, 2),
+            AdminSeat(3, 1, 2, 1),
+            AdminSeat(4, 1, 2, 2),
+        ))
+        coEvery { repo.getTickets(1) } returns Response(data = listOf(
+            AdminTicket(1, 1, 1, 1, 1),
+            AdminTicket(1, 1, 1, 2, 2),
+        ))
+
+        val expected = listOf(
+            Seat(1, 1, 1, 1),
+            Seat(2, 1, 2, 2),
+            Seat(3, 2, 1, 0),
+            Seat(4, 2, 2, 0),
+        )
+
+        val response = runBlocking { route.getSeats(1) }
         assertEquals(HttpStatusCode.OK, response.code)
         assertEquals(expected, response.data)
     }

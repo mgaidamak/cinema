@@ -76,6 +76,7 @@ data class AdminFilm(
 
 /**
  * Public seat/ticket data
+ * Status: 0 free, 1 reserved, 2 sold
  */
 data class Seat(
     val id: Int = 0,
@@ -99,6 +100,7 @@ data class AdminSeat(
 
 /**
  * Public bill data
+ * Status: 0 new, 1 payed, 2 rejected, 3 deleted
  */
 data class Bill(
     val id: Int = 0,
@@ -125,6 +127,9 @@ data class AdminBill(
     val total: Int
 )
 
+/**
+ * Status: 1 reserved, 2 sold
+ */
 data class AdminTicket(
     val id: Int = 0,
     val bill: Int = 0,

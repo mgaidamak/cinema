@@ -25,4 +25,4 @@
 2. OrderID (REFERENCES Bill)
 3. SessionID
 4. SeatID
-5. Status (0 Reserved, 1 Sold)
+5. Status (1 reserved, 2 sold)
