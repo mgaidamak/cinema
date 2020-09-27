@@ -149,6 +149,16 @@ postgres=# grant all privileges on all tables in schema public to cinema;
 sudo -u postgres psql -d hall -a -f hall/src/main/resources/schema.sql
 ```
 
+## Покрытие тестами
+
+Для расчета покрытия тестами используется JaCoCo.
+
+Запуск: `./gradlew jacocoTestCoverageVerification`
+
+Просмотр результатов: `public/build/reports/jacoco/test/html/index.html`
+
+Надо разобраться и сделать бэйджик для github. Пока приходится смотреть в файле.
+
 ## Используемые технологии
 
 * Язык программирования Kotlin 1.4;
@@ -160,7 +170,9 @@ sudo -u postgres psql -d hall -a -f hall/src/main/resources/schema.sql
 каркаса приложения сервера или клиента;
 * Actions на GitHub для CI;
 * Testcontainers для запуска БД в тестах;
-* Docker 19.03.12.
+* Docker 19.03.12;
+* Mockk для полноценного тестирования логики;
+* JaCoCo для расчета покрытия тестами.
 
 ## Список использованной 'литературы'
 

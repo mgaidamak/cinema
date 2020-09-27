@@ -1,7 +1,5 @@
 package org.mgaidamak.cinema.public.dao
 
-import java.time.ZonedDateTime
-
 /**
  * Public cinema data
  */
@@ -10,6 +8,7 @@ data class Cinema(
     val name: String,
     val city: String,
     val address: String
+    // TODO add timezone too
 ) {
     constructor(adminCinema: AdminCinema): this(
         id = adminCinema.id,
