@@ -1,6 +1,7 @@
 # cinema
 
 [![CI tests](https://github.com/mgaidamak/cinema/workflows/Gradle/badge.svg)](https://github.com/mgaidamak/cinema/actions)
+[![codecov](https://codecov.io/gh/codecov/example-java/branch/master/graph/badge.svg)](https://codecov.io/gh/codecov/example-java)
 
 ## Исходная задача
 
